@@ -1,0 +1,22 @@
+import { pgTable, text, serial, timestamp, numeric, integer } from "drizzle-orm/pg-core";
+import { createInsertSchema } from "drizzle-zod";
+import { z } from "zod/v4";
+
+export const necessidadesTable = pgTable("necessidades", {
+  id: serial("id").primaryKey(),
+  titulo: text("titulo").notNull(),
+  descricao: text("descricao"),
+  eixo: text("eixo").notNull(),
+  classificacao_moscow: text("classificacao_moscow").notNull().default("could"),
+  status: text("status").notNull().default("pendente"),
+  orcamento_planejado: numeric("orcamento_planejado", { precision: 15, scale: 2 }),
+  orcamento_realizado: numeric("orcamento_realizado", { precision: 15, scale: 2 }),
+  ano: integer("ano"),
+  observacoes: text("observacoes"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+});
+
+export const insertNecessidadeSchema = createInsertSchema(necessidadesTable).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertNecessidade = z.infer<typeof insertNecessidadeSchema>;
+export type Necessidade = typeof necessidadesTable.$inferSelect;

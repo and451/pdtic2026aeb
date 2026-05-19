@@ -1,0 +1,837 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification for PDTIC/AEB MoSCoW Management System
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: necessidades
+    description: Necessidades de TIC do PDTIC
+  - name: okrs
+    description: Objetivos e Resultados-Chave
+  - name: key-results
+    description: Resultados-Chave dos OKRs
+  - name: kpis
+    description: Indicadores-Chave de Desempenho
+  - name: dashboard
+    description: Dados resumidos do dashboard executivo
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /necessidades:
+    get:
+      operationId: listNecessidades
+      tags: [necessidades]
+      summary: Listar todas as necessidades de TIC
+      parameters:
+        - name: eixo
+          in: query
+          schema:
+            type: string
+        - name: classificacao_moscow
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Lista de necessidades
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Necessidade"
+    post:
+      operationId: createNecessidade
+      tags: [necessidades]
+      summary: Criar nova necessidade de TIC
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NecessidadeInput"
+      responses:
+        "201":
+          description: Necessidade criada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Necessidade"
+
+  /necessidades/stats:
+    get:
+      operationId: getNecessidadesStats
+      tags: [necessidades]
+      summary: Estatísticas das necessidades por status e MoSCoW
+      responses:
+        "200":
+          description: Estatísticas agregadas
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NecessidadesStats"
+
+  /necessidades/{id}:
+    get:
+      operationId: getNecessidade
+      tags: [necessidades]
+      summary: Obter necessidade por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Necessidade encontrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Necessidade"
+        "404":
+          description: Não encontrada
+    patch:
+      operationId: updateNecessidade
+      tags: [necessidades]
+      summary: Atualizar necessidade de TIC
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NecessidadeUpdate"
+      responses:
+        "200":
+          description: Necessidade atualizada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Necessidade"
+        "404":
+          description: Não encontrada
+    delete:
+      operationId: deleteNecessidade
+      tags: [necessidades]
+      summary: Remover necessidade de TIC
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Removida com sucesso
+        "404":
+          description: Não encontrada
+
+  /okrs:
+    get:
+      operationId: listOkrs
+      tags: [okrs]
+      summary: Listar OKRs
+      responses:
+        "200":
+          description: Lista de OKRs com key results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OkrWithKeyResults"
+    post:
+      operationId: createOkr
+      tags: [okrs]
+      summary: Criar novo OKR
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OkrInput"
+      responses:
+        "201":
+          description: OKR criado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Okr"
+
+  /okrs/{id}:
+    get:
+      operationId: getOkr
+      tags: [okrs]
+      summary: Obter OKR por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OKR encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkrWithKeyResults"
+        "404":
+          description: Não encontrado
+    patch:
+      operationId: updateOkr
+      tags: [okrs]
+      summary: Atualizar OKR
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OkrUpdate"
+      responses:
+        "200":
+          description: OKR atualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Okr"
+        "404":
+          description: Não encontrado
+    delete:
+      operationId: deleteOkr
+      tags: [okrs]
+      summary: Remover OKR
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Removido com sucesso
+        "404":
+          description: Não encontrado
+
+  /okrs/{id}/key-results:
+    post:
+      operationId: createKeyResult
+      tags: [key-results]
+      summary: Adicionar Key Result a um OKR
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/KeyResultInput"
+      responses:
+        "201":
+          description: Key Result criado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KeyResult"
+
+  /key-results/{id}:
+    patch:
+      operationId: updateKeyResult
+      tags: [key-results]
+      summary: Atualizar Key Result
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/KeyResultUpdate"
+      responses:
+        "200":
+          description: Key Result atualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KeyResult"
+        "404":
+          description: Não encontrado
+    delete:
+      operationId: deleteKeyResult
+      tags: [key-results]
+      summary: Remover Key Result
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Removido com sucesso
+        "404":
+          description: Não encontrado
+
+  /kpis:
+    get:
+      operationId: listKpis
+      tags: [kpis]
+      summary: Listar KPIs
+      responses:
+        "200":
+          description: Lista de KPIs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Kpi"
+    post:
+      operationId: createKpi
+      tags: [kpis]
+      summary: Criar novo KPI
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/KpiInput"
+      responses:
+        "201":
+          description: KPI criado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Kpi"
+
+  /kpis/{id}:
+    patch:
+      operationId: updateKpi
+      tags: [kpis]
+      summary: Atualizar KPI
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/KpiUpdate"
+      responses:
+        "200":
+          description: KPI atualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Kpi"
+        "404":
+          description: Não encontrado
+    delete:
+      operationId: deleteKpi
+      tags: [kpis]
+      summary: Remover KPI
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Removido com sucesso
+        "404":
+          description: Não encontrado
+
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Resumo executivo do dashboard
+      responses:
+        "200":
+          description: Dados consolidados do dashboard
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    Necessidade:
+      type: object
+      required:
+        - id
+        - titulo
+        - eixo
+        - classificacao_moscow
+        - status
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: integer
+        titulo:
+          type: string
+        descricao:
+          type: ["string", "null"]
+        eixo:
+          type: string
+          description: "infraestrutura | sistemas | dados_inovacao_seguranca | governanca"
+        classificacao_moscow:
+          type: string
+          description: "must | should | could | wont"
+        status:
+          type: string
+          description: "atendida | em_andamento | nao_atendida | cancelada | pendente"
+        orcamento_planejado:
+          type: ["number", "null"]
+        orcamento_realizado:
+          type: ["number", "null"]
+        ano:
+          type: ["integer", "null"]
+        observacoes:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    NecessidadeInput:
+      type: object
+      required:
+        - titulo
+        - eixo
+        - classificacao_moscow
+        - status
+      properties:
+        titulo:
+          type: string
+          minLength: 1
+        descricao:
+          type: string
+        eixo:
+          type: string
+        classificacao_moscow:
+          type: string
+        status:
+          type: string
+        orcamento_planejado:
+          type: number
+        orcamento_realizado:
+          type: number
+        ano:
+          type: integer
+        observacoes:
+          type: string
+
+    NecessidadeUpdate:
+      type: object
+      properties:
+        titulo:
+          type: string
+          minLength: 1
+        descricao:
+          type: string
+        eixo:
+          type: string
+        classificacao_moscow:
+          type: string
+        status:
+          type: string
+        orcamento_planejado:
+          type: number
+        orcamento_realizado:
+          type: number
+        ano:
+          type: integer
+        observacoes:
+          type: string
+
+    NecessidadesStats:
+      type: object
+      required:
+        - total
+        - por_status
+        - por_moscow
+        - por_eixo
+        - orcamento_total_planejado
+        - orcamento_total_realizado
+      properties:
+        total:
+          type: integer
+        por_status:
+          type: object
+          additionalProperties:
+            type: integer
+        por_moscow:
+          type: object
+          additionalProperties:
+            type: integer
+        por_eixo:
+          type: object
+          additionalProperties:
+            type: integer
+        orcamento_total_planejado:
+          type: number
+        orcamento_total_realizado:
+          type: number
+
+    Okr:
+      type: object
+      required:
+        - id
+        - objetivo
+        - ano
+        - status
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: integer
+        objetivo:
+          type: string
+        descricao:
+          type: ["string", "null"]
+        trimestre:
+          type: ["string", "null"]
+        ano:
+          type: integer
+        status:
+          type: string
+          description: "ativo | concluido | cancelado"
+        progresso:
+          type: integer
+          description: "0-100"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    OkrWithKeyResults:
+      type: object
+      required:
+        - id
+        - objetivo
+        - ano
+        - status
+        - createdAt
+        - updatedAt
+        - keyResults
+      properties:
+        id:
+          type: integer
+        objetivo:
+          type: string
+        descricao:
+          type: ["string", "null"]
+        trimestre:
+          type: ["string", "null"]
+        ano:
+          type: integer
+        status:
+          type: string
+        progresso:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        keyResults:
+          type: array
+          items:
+            $ref: "#/components/schemas/KeyResult"
+
+    OkrInput:
+      type: object
+      required:
+        - objetivo
+        - ano
+        - status
+      properties:
+        objetivo:
+          type: string
+          minLength: 1
+        descricao:
+          type: string
+        trimestre:
+          type: string
+        ano:
+          type: integer
+        status:
+          type: string
+        progresso:
+          type: integer
+
+    OkrUpdate:
+      type: object
+      properties:
+        objetivo:
+          type: string
+          minLength: 1
+        descricao:
+          type: string
+        trimestre:
+          type: string
+        ano:
+          type: integer
+        status:
+          type: string
+        progresso:
+          type: integer
+
+    KeyResult:
+      type: object
+      required:
+        - id
+        - okrId
+        - descricao
+        - meta
+        - unidade
+        - valor_atual
+        - status
+      properties:
+        id:
+          type: integer
+        okrId:
+          type: integer
+        descricao:
+          type: string
+        meta:
+          type: string
+        unidade:
+          type: string
+        valor_atual:
+          type: string
+        status:
+          type: string
+          description: "nao_iniciado | em_andamento | concluido | cancelado"
+
+    KeyResultInput:
+      type: object
+      required:
+        - descricao
+        - meta
+        - unidade
+        - valor_atual
+        - status
+      properties:
+        descricao:
+          type: string
+          minLength: 1
+        meta:
+          type: string
+        unidade:
+          type: string
+        valor_atual:
+          type: string
+        status:
+          type: string
+
+    KeyResultUpdate:
+      type: object
+      properties:
+        descricao:
+          type: string
+          minLength: 1
+        meta:
+          type: string
+        unidade:
+          type: string
+        valor_atual:
+          type: string
+        status:
+          type: string
+
+    Kpi:
+      type: object
+      required:
+        - id
+        - nome
+        - categoria
+        - meta
+        - valor_atual
+        - unidade
+        - semaforo
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: integer
+        nome:
+          type: string
+        descricao:
+          type: ["string", "null"]
+        categoria:
+          type: string
+          description: "infraestrutura | seguranca | satisfacao | entrega"
+        meta:
+          type: string
+        valor_atual:
+          type: string
+        unidade:
+          type: string
+        tendencia:
+          type: string
+          description: "up | down | stable"
+        semaforo:
+          type: string
+          description: "verde | amarelo | vermelho"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    KpiInput:
+      type: object
+      required:
+        - nome
+        - categoria
+        - meta
+        - valor_atual
+        - unidade
+        - semaforo
+      properties:
+        nome:
+          type: string
+          minLength: 1
+        descricao:
+          type: string
+        categoria:
+          type: string
+        meta:
+          type: string
+        valor_atual:
+          type: string
+        unidade:
+          type: string
+        tendencia:
+          type: string
+        semaforo:
+          type: string
+
+    KpiUpdate:
+      type: object
+      properties:
+        nome:
+          type: string
+          minLength: 1
+        descricao:
+          type: string
+        categoria:
+          type: string
+        meta:
+          type: string
+        valor_atual:
+          type: string
+        unidade:
+          type: string
+        tendencia:
+          type: string
+        semaforo:
+          type: string
+
+    DashboardSummary:
+      type: object
+      required:
+        - necessidades_total
+        - necessidades_por_status
+        - necessidades_por_moscow
+        - orcamento_planejado_total
+        - orcamento_realizado_total
+        - orcamento_execucao_pct
+        - okrs_total
+        - okrs_por_status
+        - kpis_total
+        - kpis_por_semaforo
+      properties:
+        necessidades_total:
+          type: integer
+        necessidades_por_status:
+          type: object
+          additionalProperties:
+            type: integer
+        necessidades_por_moscow:
+          type: object
+          additionalProperties:
+            type: integer
+        orcamento_planejado_total:
+          type: number
+        orcamento_realizado_total:
+          type: number
+        orcamento_execucao_pct:
+          type: number
+        okrs_total:
+          type: integer
+        okrs_por_status:
+          type: object
+          additionalProperties:
+            type: integer
+        kpis_total:
+          type: integer
+        kpis_por_semaforo:
+          type: object
+          additionalProperties:
+            type: integer
