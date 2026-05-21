@@ -65,7 +65,12 @@ router.post("/necessidades", async (req, res): Promise<void> => {
     return;
   }
 
-  const [row] = await db.insert(necessidadesTable).values(parsed.data).returning();
+  const insertData = {
+    ...parsed.data,
+    orcamento_planejado: parsed.data.orcamento_planejado?.toString() ?? null,
+    orcamento_realizado: parsed.data.orcamento_realizado?.toString() ?? null,
+  };
+  const [row] = await db.insert(necessidadesTable).values(insertData).returning();
   res.status(201).json(row);
 });
 
@@ -97,10 +102,13 @@ router.patch("/necessidades/:id", async (req, res): Promise<void> => {
     return;
   }
 
-  const [row] = await db.update(necessidadesTable).set({
+  const updateData = {
     ...parsed.data,
+    orcamento_planejado: parsed.data.orcamento_planejado?.toString() ?? undefined,
+    orcamento_realizado: parsed.data.orcamento_realizado?.toString() ?? undefined,
     updatedAt: new Date(),
-  }).where(eq(necessidadesTable.id, params.data.id)).returning();
+  };
+  const [row] = await db.update(necessidadesTable).set(updateData).where(eq(necessidadesTable.id, params.data.id)).returning();
 
   if (!row) {
     res.status(404).json({ error: "Necessidade não encontrada" });
