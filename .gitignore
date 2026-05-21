@@ -3,6 +3,9 @@
 # compiled output
 dist
 tmp
+# Keep lib declaration files so Vercel can type-check without rebuilding libs
+!lib/*/dist/
+!lib/*/dist/**
 out-tsc
 *.tsbuildinfo
 .expo
