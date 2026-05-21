@@ -7,7 +7,7 @@ export const necessidadesTable = pgTable("necessidades", {
   titulo: text("titulo").notNull(),
   descricao: text("descricao"),
   eixo: text("eixo").notNull(),
-  classificacao_moscow: text("classificacao_moscow").notNull().default("could"),
+  classificacao_moscow: text("classificacao_moscow").notNull().default("pendente"),
   status: text("status").notNull().default("pendente"),
   orcamento_planejado: numeric("orcamento_planejado", { precision: 15, scale: 2 }),
   orcamento_realizado: numeric("orcamento_realizado", { precision: 15, scale: 2 }),

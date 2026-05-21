@@ -127,16 +127,9 @@ pnpm install
 Crie um arquivo `.env` na raiz com:
 
 ```env
-PORT=8080
 DATABASE_URL=postgresql://usuario:senha@localhost:5432/pdtic
-JWT_SECRET=sua_chave_secreta_min_32_chars
-CORS_ORIGIN=http://localhost:5173
+SESSION_SECRET=sua_chave_secreta
 ```
-
-- `PORT` — porta do servidor API (obrigatório)
-- `DATABASE_URL` — string de conexão PostgreSQL (obrigatória)
-- `JWT_SECRET` — chave para assinatura de tokens JWT (obrigatória em produção; em desenvolvimento, se omitida, o servidor loga um warning e permite requisições autenticadas)
-- `CORS_ORIGIN` — origem permitida para CORS (opcional; se omitido, CORS fica aberto em desenvolvimento)
 
 ### Banco de dados
 
@@ -158,7 +151,7 @@ pnpm --filter @workspace/api-server run dev
 pnpm --filter @workspace/pdtic-moscow run dev
 ```
 
-Acesse: `http://localhost:<porta-do-frontend>` 
+Acesse: `http://localhost:<porta-do-frontend>`
 
 ---
 
@@ -192,39 +185,6 @@ pnpm run build
 - **Orçamentos como NUMERIC no PostgreSQL**: evita erros de ponto flutuante. O Drizzle retorna esses valores como `string` — sempre usar `parseFloat()` antes de operações matemáticas.
 - **MoSCoW como enum string**: armazenado em lowercase (`must`, `should`, `could`, `wont`); os rótulos de exibição ficam em `moscow.ts` para manter o banco limpo.
 - **Semáforo de KPI**: campo `semaforo` com valores `verde` / `amarelo` / `vermelho`, sem thresholds computados — simples e auditável.
-
----
-
-## Avaliação Técnica
-
-### Pontos Positivos
-
-- **Arquitetura contract-first**: `openapi.yaml` é a fonte da verdade; gera hooks React Query e schemas Zod via Orval, garantindo consistência entre servidor e cliente.
-- **Monorepo bem estruturado**: separação clara entre `lib/` (compartilhado) e `artifacts/` (aplicações), com pnpm workspaces.
-- **Qualidade de código**: uso de `numeric(15,2)` para orçamentos, middleware de logging com pino-http, helpers centralizados para labels/cores, sidebar mobile-responsive.
-- **Stack moderna**: TypeScript 5.9, Node.js 24, Express 5, Drizzle ORM, Zod v4, React 19 + Vite.
-- **Dados reais**: 61 necessidades do PDTIC/AEB 2024-2026 seedadas, com valores contratuais reais.
-
-### Pontos de Atenção
-
-- **Segurança**: CORS restringido via `CORS_ORIGIN`; autenticação JWT nas rotas de mutação (POST/PATCH/DELETE); rate limiting de 100 req/min por IP. Em desenvolvimento, se `JWT_SECRET` não estiver configurado, o servidor loga warning e permite requisições para não travar o workflow local.
-- **Testes**: testes unitários adicionados para validação de ambiente (`env.test.ts`), middleware de autenticação (`auth.test.ts`) e rate limiting (`rate-limit.test.ts`).
-- **Build/deploy**: o script `dev` do api-server ainda usa `export NODE_ENV=development` (Unix shell); recomenda-se ajustar para Windows se necessário.
-- **Consistência de dados**: default de `classificacao_moscow` alterado para `"could"` no schema do banco; `"pendente"` adicionado aos helpers `MOSCOW_LABELS`/`MOSCOW_COLORS` para cobrir registros legados; acentuação de `"Não Atendida"` corrigida.
-- **Dependências**: o frontend ainda declara todos os componentes shadcn/ui no `package.json` — limpeza opcional.
-
-### Recomendações Aplicadas
-
-| Prioridade | Ação | Status |
-|---|---|---|
-| Alta | Autenticação JWT nas rotas de mutação | Aplicado |
-| Alta | CORS restrito a origens conhecidas | Aplicado |
-| Alta | Testes unitários para middlewares críticos | Aplicado |
-| Média | Rate limiting (`express-rate-limit`) | Aplicado |
-| Média | Padronizar default `classificacao_moscow` | Aplicado |
-| Média | Corrigir acentuação em `"Não Atendida"` | Aplicado |
-| Baixa | Limpar dependências shadcn/ui não utilizadas | Pendente |
-| Baixa | Validação de ambiente (Zod) no servidor | Aplicado |
 
 ---
 

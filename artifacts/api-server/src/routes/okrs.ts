@@ -13,7 +13,6 @@ import {
   UpdateKeyResultBody,
   DeleteKeyResultParams,
 } from "@workspace/api-zod";
-import { requireAuth } from "../middlewares/auth";
 
 const router: IRouter = Router();
 
@@ -33,7 +32,7 @@ router.get("/okrs", async (_req, res): Promise<void> => {
   res.json(result);
 });
 
-router.post("/okrs", requireAuth, async (req, res): Promise<void> => {
+router.post("/okrs", async (req, res): Promise<void> => {
   const parsed = CreateOkrBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -57,7 +56,7 @@ router.get("/okrs/:id", async (req, res): Promise<void> => {
   res.json(result);
 });
 
-router.patch("/okrs/:id", requireAuth, async (req, res): Promise<void> => {
+router.patch("/okrs/:id", async (req, res): Promise<void> => {
   const params = UpdateOkrParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -76,7 +75,7 @@ router.patch("/okrs/:id", requireAuth, async (req, res): Promise<void> => {
   res.json(row);
 });
 
-router.delete("/okrs/:id", requireAuth, async (req, res): Promise<void> => {
+router.delete("/okrs/:id", async (req, res): Promise<void> => {
   const params = DeleteOkrParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -90,7 +89,7 @@ router.delete("/okrs/:id", requireAuth, async (req, res): Promise<void> => {
   res.sendStatus(204);
 });
 
-router.post("/okrs/:id/key-results", requireAuth, async (req, res): Promise<void> => {
+router.post("/okrs/:id/key-results", async (req, res): Promise<void> => {
   const params = CreateKeyResultParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -110,7 +109,7 @@ router.post("/okrs/:id/key-results", requireAuth, async (req, res): Promise<void
   res.status(201).json(row);
 });
 
-router.patch("/key-results/:id", requireAuth, async (req, res): Promise<void> => {
+router.patch("/key-results/:id", async (req, res): Promise<void> => {
   const params = UpdateKeyResultParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -129,7 +128,7 @@ router.patch("/key-results/:id", requireAuth, async (req, res): Promise<void> =>
   res.json(row);
 });
 
-router.delete("/key-results/:id", requireAuth, async (req, res): Promise<void> => {
+router.delete("/key-results/:id", async (req, res): Promise<void> => {
   const params = DeleteKeyResultParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });

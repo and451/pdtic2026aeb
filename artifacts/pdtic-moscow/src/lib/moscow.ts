@@ -3,7 +3,6 @@ export const MOSCOW_LABELS: Record<string, string> = {
   should: "Should Have",
   could: "Could Have",
   wont: "Won't Have",
-  pendente: "Pendente",
 };
 
 export const MOSCOW_COLORS: Record<string, string> = {
@@ -11,13 +10,12 @@ export const MOSCOW_COLORS: Record<string, string> = {
   should: "bg-orange-100 text-orange-800 border border-orange-200",
   could: "bg-blue-100 text-blue-800 border border-blue-200",
   wont: "bg-gray-100 text-gray-600 border border-gray-200",
-  pendente: "bg-yellow-100 text-yellow-800 border border-yellow-200",
 };
 
 export const STATUS_LABELS: Record<string, string> = {
   atendida: "Atendida",
   em_andamento: "Em Andamento",
-  nao_atendida: "Não Atendida",
+  nao_atendida: "Nao Atendida",
   cancelada: "Cancelada",
   pendente: "Pendente",
 };

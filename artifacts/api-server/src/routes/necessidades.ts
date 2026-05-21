@@ -9,7 +9,6 @@ import {
   CreateNecessidadeBody,
   UpdateNecessidadeBody,
 } from "@workspace/api-zod";
-import { requireAuth } from "../middlewares/auth";
 
 const router: IRouter = Router();
 
@@ -59,7 +58,7 @@ router.get("/necessidades", async (req, res): Promise<void> => {
   res.json(rows);
 });
 
-router.post("/necessidades", requireAuth, async (req, res): Promise<void> => {
+router.post("/necessidades", async (req, res): Promise<void> => {
   const parsed = CreateNecessidadeBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -85,7 +84,7 @@ router.get("/necessidades/:id", async (req, res): Promise<void> => {
   res.json(row);
 });
 
-router.patch("/necessidades/:id", requireAuth, async (req, res): Promise<void> => {
+router.patch("/necessidades/:id", async (req, res): Promise<void> => {
   const params = UpdateNecessidadeParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -110,7 +109,7 @@ router.patch("/necessidades/:id", requireAuth, async (req, res): Promise<void> =
   res.json(row);
 });
 
-router.delete("/necessidades/:id", requireAuth, async (req, res): Promise<void> => {
+router.delete("/necessidades/:id", async (req, res): Promise<void> => {
   const params = DeleteNecessidadeParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
