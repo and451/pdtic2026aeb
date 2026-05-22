@@ -1,5 +1,7 @@
 {
+  "framework": null,
   "installCommand": "pnpm install --frozen-lockfile",
   "buildCommand": "pnpm -w run typecheck:libs && pnpm --filter @workspace/pdtic-moscow run build",
-  "outputDirectory": "artifacts/pdtic-moscow/dist"
+  "outputDirectory": "artifacts/pdtic-moscow/dist",
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
