@@ -1,6 +1,4 @@
 {
-  "framework": "vite",
   "installCommand": "pnpm install --frozen-lockfile",
-  "buildCommand": "pnpm -w run typecheck:libs && pnpm --filter @workspace/pdtic-moscow run build",
-  "outputDirectory": "dist"
+  "buildCommand": "sh vercel-build.sh"
 }
