@@ -2,7 +2,7 @@
 
 Sistema web de gestão do **Plano Diretor de Tecnologia da Informação e Comunicação (PDTIC 2024-2026)** da Agência Espacial Brasileira (AEB), desenvolvido pela equipe CTI/CGD-AEB.
 
-Utiliza a metodologia **MoSCoW** para priorização das 61 necessidades de TIC mapeadas, com acompanhamento de OKRs, KPIs e execução orçamentária.
+Utiliza a metodologia **MoSCoW** para priorização das 61 necessidades de TIC mapeadas, com acompanhamento de OKRs, KPIs, execução orçamentária e fluxo de aprovação com governança.
 
 ---
 
@@ -17,10 +17,18 @@ Utiliza a metodologia **MoSCoW** para priorização das 61 necessidades de TIC m
 
 ### Necessidades de TIC
 - Tabela completa das 61 necessidades do PDTIC 2024-2026
-- Filtros por eixo, classificação MoSCoW e status
+- Filtros por eixo, classificação MoSCoW, status e workflow
 - Campo de busca por título
 - Cadastro de novas necessidades via formulário
-- Página de detalhe com edição completa: título, eixo, MoSCoW, status, orçamento planejado, valor contratado, descrição, observações e número SEI
+- Página de detalhe com edição completa: título, eixo, MoSCoW, status, workflow, orçamento planejado, valor contratado, descrição, observações e número SEI
+- **Edição inline** de MoSCoW, status e workflow diretamente na tabela
+- **Histórico de alterações** (audit log) por necessidade
+
+### Workflow de Aprovação
+- 5 etapas do processo: Rascunho → Enviada → Aprovada Dir. → Revisão CTI → Finalizada
+- Devolução para correções (status "Devolvida")
+- **Regra de imutabilidade**: necessidades "Finalizadas" não podem ser editadas ou removidas
+- Visualização do ciclo de processo em `/ciclo`
 
 ### OKRs
 - 3 OKRs com 9 Key Results
@@ -31,6 +39,13 @@ Utiliza a metodologia **MoSCoW** para priorização das 61 necessidades de TIC m
 - 9 indicadores agrupados por categoria
 - Semáforo visual (verde / amarelo / vermelho)
 - Setas de tendência e edição inline de valores
+
+### Autenticação e Governança
+- Login com JWT (bcrypt + jose)
+- Perfis de usuário com roles (`admin`, `user`, etc.)
+- Sidebar exibe usuário logado com nome e role
+- Logout integrado
+- Rotas protegidas (redirecionamento automático para `/login`)
 
 ---
 
@@ -49,6 +64,7 @@ Distribuídas em 4 eixos estratégicos:
 Cada necessidade registra:
 - Classificação MoSCoW (`must` / `should` / `could` / `wont`)
 - Status (`atendida` / `em_andamento` / `nao_atendida` / `sem_informacao`)
+- **Workflow** (`rascunho` / `enviada` / `aprovada_dir` / `revisao_cti` / `finalizada` / `devolvida`)
 - Orçamento planejado (R$) e valor efetivamente contratado (R$)
 - Número SEI do processo administrativo (quando aplicável)
 - Observações e referências cruzadas
@@ -84,6 +100,7 @@ Itens com contratos assinados incluem o valor real (ex.: Service Desk R$ 1.881.2
 | Codegen de API | Orval (OpenAPI → React Query hooks + Zod schemas) |
 | Build | esbuild (bundle CJS) |
 | Monorepo | pnpm workspaces |
+| Auth | bcryptjs, jose (JWT) |
 
 ---
 
@@ -93,11 +110,12 @@ Itens com contratos assinados incluem o valor real (ex.: Service Desk R$ 1.881.2
 .
 ├── artifacts/
 │   ├── api-server/          # Servidor Express 5 (porta 8080, prefixo /api)
-│   │   └── src/routes/      # Handlers REST: necessidades, okrs, kpis
+│   │   └── src/routes/      # Handlers REST: necessidades, okrs, kpis, auth
 │   └── pdtic-moscow/        # Frontend React + Vite
 │       └── src/
-│           ├── pages/       # Dashboard, Necessidades, Detalhe, OKRs, KPIs
+│           ├── pages/       # Dashboard, Necessidades, Detalhe, OKRs, KPIs, Sobre, Ciclo, Login
 │           ├── components/  # Layout, sidebar, UI compartilhada
+│           ├── hooks/       # useAuth, useToast
 │           └── lib/         # Helpers MoSCoW, formatação
 ├── lib/
 │   ├── api-spec/            # openapi.yaml — contrato central da API
@@ -128,7 +146,7 @@ Crie um arquivo `.env` na raiz com:
 
 ```env
 DATABASE_URL=postgresql://usuario:senha@localhost:5432/pdtic
-SESSION_SECRET=sua_chave_secreta
+JWT_SECRET=sua_chave_secreta_jwt
 ```
 
 ### Banco de dados
@@ -152,6 +170,34 @@ pnpm --filter @workspace/pdtic-moscow run dev
 ```
 
 Acesse: `http://localhost:<porta-do-frontend>`
+
+---
+
+## Deploy na Vercel
+
+O projeto é configurado para deploy na **Vercel** como SPA estática com backend serverless.
+
+### Configuração
+- `vercel.json` na raiz define:
+  - `installCommand`: `pnpm install --frozen-lockfile`
+  - `buildCommand`: `sh vercel-build.sh`
+- `vercel-build.sh` executa:
+  1. Typecheck das libs (`pnpm -w run typecheck:libs`)
+  2. Build do frontend (`pnpm --filter @workspace/pdtic-moscow run build`)
+  3. Copia os assets para `.vercel/output/static/`
+  4. Gera `config.json` com fallback SPA (`/*` → `index.html`)
+
+### Variáveis de ambiente na Vercel
+Configure no dashboard da Vercel:
+- `DATABASE_URL` — URL do PostgreSQL
+- `JWT_SECRET` — chave secreta para assinatura de tokens JWT
+
+> **Nota**: o arquivo `vercel-build.sh` deve estar com permissão de execução no Git (`100755`). No Windows, execute:
+> ```bash
+> git update-index --chmod=+x vercel-build.sh
+> git add vercel-build.sh
+> git commit -m "fix: tornar vercel-build.sh executável"
+> ```
 
 ---
 
@@ -185,6 +231,8 @@ pnpm run build
 - **Orçamentos como NUMERIC no PostgreSQL**: evita erros de ponto flutuante. O Drizzle retorna esses valores como `string` — sempre usar `parseFloat()` antes de operações matemáticas.
 - **MoSCoW como enum string**: armazenado em lowercase (`must`, `should`, `could`, `wont`); os rótulos de exibição ficam em `moscow.ts` para manter o banco limpo.
 - **Semáforo de KPI**: campo `semaforo` com valores `verde` / `amarelo` / `vermelho`, sem thresholds computados — simples e auditável.
+- **Workflow status com regras de negócio no backend**: a regra de imutabilidade para status "finalizada" é aplicada nas rotas Express, garantindo consistência independente do frontend.
+- **Audit log centralizado**: todas as alterações em necessidades são registradas automaticamente na tabela `audit_logs`, rastreando campo, valor anterior, valor novo e usuário.
 
 ---
 
