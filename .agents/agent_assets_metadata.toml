@@ -1,0 +1,14 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "MOLVYekUGCxY-_NCC7LUd"
+uri = "file://pdtic-moscow.zip"
+type = "unspecified"
+title = "PDTIC/AEB — Gestão MoSCoW, OKR e KPI"
+
+[[outputs]]
+id = "tJuGIOXJJfK-shKBSQxbR"
+uri = "file://README.md"
+type = "text"
+title = "README.md — PDTIC/AEB Gestão MoSCoW, OKR e KPI"

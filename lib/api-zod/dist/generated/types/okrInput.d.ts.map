@@ -1,0 +1,1 @@
+{"version":3,"file":"okrInput.d.ts","sourceRoot":"","sources":["../../../src/generated/types/okrInput.ts"],"names":[],"mappings":"AAAA;;;;;;GAMG;AAEH,MAAM,WAAW,QAAQ;IACvB,mBAAmB;IACnB,QAAQ,EAAE,MAAM,CAAC;IACjB,SAAS,CAAC,EAAE,MAAM,CAAC;IACnB,SAAS,CAAC,EAAE,MAAM,CAAC;IACnB,GAAG,EAAE,MAAM,CAAC;IACZ,MAAM,EAAE,MAAM,CAAC;IACf,SAAS,CAAC,EAAE,MAAM,CAAC;CACpB"}
