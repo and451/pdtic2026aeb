@@ -28,7 +28,7 @@ app.use("/api", router);
 if (process.env.NODE_ENV === "production") {
   const frontendDist = path.resolve(process.cwd(), "artifacts/pdtic-moscow/dist");
   app.use(express.static(frontendDist));
-  app.get("*", (req, res) => {
+  app.get("/{*rest}", (_req, res) => {
     res.sendFile(path.resolve(frontendDist, "index.html"));
   });
 }
