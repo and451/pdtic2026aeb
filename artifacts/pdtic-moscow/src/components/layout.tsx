@@ -1,19 +1,22 @@
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, List, Target, BarChart3, Info, Menu, X } from "lucide-react";
+import { LayoutDashboard, List, Target, BarChart3, Info, Menu, X, LogOut, User, GitBranch } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/use-auth";
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/necessidades", label: "Necessidades", icon: List },
   { href: "/okrs", label: "OKRs", icon: Target },
   { href: "/kpis", label: "KPIs", icon: BarChart3 },
+  { href: "/ciclo", label: "Ciclo", icon: GitBranch },
   { href: "/sobre", label: "Sobre", icon: Info },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { user, logout } = useAuth();
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
@@ -53,7 +56,26 @@ export function Layout({ children }: { children: React.ReactNode }) {
             );
           })}
         </nav>
-        <div className="px-5 py-4 border-t border-sidebar-border">
+        <div className="px-5 py-4 border-t border-sidebar-border space-y-3">
+          {user && (
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-full bg-sidebar-primary/20 flex items-center justify-center">
+                <User className="w-3.5 h-3.5 text-sidebar-primary-foreground" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-medium text-sidebar-foreground truncate">{user.nome}</p>
+                <p className="text-[10px] text-sidebar-foreground/50 uppercase">{user.role}</p>
+              </div>
+            </div>
+          )}
+          {user && (
+            <button
+              onClick={logout}
+              className="flex items-center gap-2 text-xs text-sidebar-foreground/60 hover:text-sidebar-foreground transition-colors"
+            >
+              <LogOut className="w-3.5 h-3.5" /> Sair
+            </button>
+          )}
           <p className="text-xs text-sidebar-foreground/40">CTI / CGD-AEB &mdash; 2026</p>
         </div>
       </aside>

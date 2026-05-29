@@ -11,7 +11,7 @@ import {
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Plus, Search, Filter, Trash2, ExternalLink, ChevronDown } from "lucide-react";
-import { MOSCOW_LABELS, MOSCOW_COLORS, STATUS_LABELS, STATUS_COLORS, EIXO_LABELS, formatCurrency } from "@/lib/moscow";
+import { MOSCOW_LABELS, MOSCOW_COLORS, STATUS_LABELS, STATUS_COLORS, WORKFLOW_LABELS, WORKFLOW_COLORS, EIXO_LABELS, formatCurrency } from "@/lib/moscow";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -26,6 +26,7 @@ import { Textarea } from "@/components/ui/textarea";
 const EIXOS = ["infraestrutura", "sistemas", "dados_inovacao_seguranca", "governanca"];
 const MOSCOW_OPTIONS = ["must", "should", "could", "wont"];
 const STATUS_OPTIONS = ["atendida", "em_andamento", "nao_atendida", "cancelada", "pendente"];
+const WORKFLOW_OPTIONS = ["rascunho", "enviada", "aprovada_dir", "revisao_cti", "finalizada", "devolvida"];
 
 type FormData = {
   titulo: string;
@@ -46,8 +47,9 @@ export default function Necessidades() {
   const [filterEixo, setFilterEixo] = useState("all");
   const [filterMoscow, setFilterMoscow] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [filterWorkflow, setFilterWorkflow] = useState("all");
   const [showCreate, setShowCreate] = useState(false);
-  const [editingCell, setEditingCell] = useState<{ id: number; field: "moscow" | "status" } | null>(null);
+  const [editingCell, setEditingCell] = useState<{ id: number; field: "moscow" | "status" | "workflow" } | null>(null);
 
   const params = {
     ...(filterEixo !== "all" && { eixo: filterEixo }),
@@ -70,10 +72,12 @@ export default function Necessidades() {
     },
   });
 
-  const filtered = necessidades.filter((n) =>
-    n.titulo.toLowerCase().includes(search.toLowerCase()) ||
-    (n.descricao ?? "").toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = necessidades.filter((n) => {
+    const matchesSearch = n.titulo.toLowerCase().includes(search.toLowerCase()) ||
+      (n.descricao ?? "").toLowerCase().includes(search.toLowerCase());
+    const matchesWorkflow = filterWorkflow === "all" || n.workflow_status === filterWorkflow;
+    return matchesSearch && matchesWorkflow;
+  });
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: getListNecessidadesQueryKey(params) });
@@ -166,6 +170,15 @@ export default function Necessidades() {
             {STATUS_OPTIONS.map((s) => <SelectItem key={s} value={s}>{STATUS_LABELS[s]}</SelectItem>)}
           </SelectContent>
         </Select>
+        <Select value={filterWorkflow} onValueChange={setFilterWorkflow}>
+          <SelectTrigger className="w-44" data-testid="select-filter-workflow">
+            <SelectValue placeholder="Workflow" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos</SelectItem>
+            {WORKFLOW_OPTIONS.map((w) => <SelectItem key={w} value={w}>{WORKFLOW_LABELS[w]}</SelectItem>)}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Table */}
@@ -187,6 +200,7 @@ export default function Necessidades() {
                 <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden md:table-cell">Eixo</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">MoSCoW</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Workflow</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden lg:table-cell">Orc. Planejado</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden xl:table-cell">Valor Contratado</th>
                 <th className="px-4 py-3 w-20"></th>
@@ -281,6 +295,47 @@ export default function Necessidades() {
                         onClick={() => setEditingCell({ id: n.id, field: "status" })}
                       >
                         {STATUS_LABELS[n.status] ?? n.status}
+                      </button>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    {editingCell?.id === n.id && editingCell.field === "workflow" ? (
+                      <Select
+                        value={n.workflow_status}
+                        onValueChange={(v) => {
+                          if (v !== n.workflow_status) {
+                            updateMut.mutate(
+                              { id: n.id, data: { workflow_status: v } },
+                              {
+                                onSuccess: () => {
+                                  toast({ title: "Workflow atualizado" });
+                                  invalidate();
+                                },
+                                onSettled: () => setEditingCell(null),
+                              }
+                            );
+                          } else {
+                            setEditingCell(null);
+                          }
+                        }}
+                        open
+                        onOpenChange={(open) => { if (!open) setEditingCell(null); }}
+                      >
+                        <SelectTrigger className="w-40 h-7 text-xs px-2 py-0">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {WORKFLOW_OPTIONS.map((w) => (
+                            <SelectItem key={w} value={w} className="text-xs">{WORKFLOW_LABELS[w]}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <button
+                        className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium cursor-pointer hover:opacity-80 ${WORKFLOW_COLORS[n.workflow_status] ?? ""}`}
+                        onClick={() => setEditingCell({ id: n.id, field: "workflow" })}
+                      >
+                        {WORKFLOW_LABELS[n.workflow_status] ?? n.workflow_status}
                       </button>
                     )}
                   </td>

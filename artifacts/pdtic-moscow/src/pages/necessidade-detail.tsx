@@ -1,7 +1,7 @@
 import { useRoute, useLocation } from "wouter";
 import { useGetNecessidade, useUpdateNecessidade, getGetNecessidadeQueryKey, getListNecessidadesQueryKey, getGetNecessidadesStatsQueryKey, getGetDashboardSummaryQueryKey } from "@workspace/api-client-react";
-import { useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Save } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft, Save, History } from "lucide-react";
 import { useForm, Controller } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -9,11 +9,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { MOSCOW_LABELS, MOSCOW_COLORS, STATUS_LABELS, STATUS_COLORS, EIXO_LABELS, formatCurrency } from "@/lib/moscow";
+import { MOSCOW_LABELS, MOSCOW_COLORS, STATUS_LABELS, STATUS_COLORS, WORKFLOW_LABELS, WORKFLOW_COLORS, EIXO_LABELS, formatCurrency } from "@/lib/moscow";
 
 const EIXOS = ["infraestrutura", "sistemas", "dados_inovacao_seguranca", "governanca"];
 const MOSCOW_OPTIONS = ["must", "should", "could", "wont"];
 const STATUS_OPTIONS = ["atendida", "em_andamento", "nao_atendida", "cancelada", "pendente"];
+const WORKFLOW_OPTIONS = ["rascunho", "enviada", "aprovada_dir", "revisao_cti", "finalizada", "devolvida"];
 
 type FormData = {
   titulo: string;
@@ -21,6 +22,7 @@ type FormData = {
   eixo: string;
   classificacao_moscow: string;
   status: string;
+  workflow_status: string;
   orcamento_planejado: string;
   orcamento_realizado: string;
   ano: string;
@@ -41,6 +43,7 @@ function NecessidadeForm({ n, id }: { n: Necessidade; id: number }) {
       eixo: n.eixo,
       classificacao_moscow: n.classificacao_moscow,
       status: n.status,
+      workflow_status: n.workflow_status,
       orcamento_planejado: n.orcamento_planejado != null ? String(n.orcamento_planejado) : "",
       orcamento_realizado: n.orcamento_realizado != null ? String(n.orcamento_realizado) : "",
       ano: n.ano != null ? String(n.ano) : "",
@@ -57,6 +60,7 @@ function NecessidadeForm({ n, id }: { n: Necessidade; id: number }) {
         eixo: data.eixo,
         classificacao_moscow: data.classificacao_moscow,
         status: data.status,
+        workflow_status: data.workflow_status,
         orcamento_planejado: data.orcamento_planejado ? parseFloat(data.orcamento_planejado) : undefined,
         orcamento_realizado: data.orcamento_realizado ? parseFloat(data.orcamento_realizado) : undefined,
         ano: data.ano ? parseInt(data.ano) : undefined,
@@ -129,8 +133,19 @@ function NecessidadeForm({ n, id }: { n: Necessidade; id: number }) {
           />
         </div>
         <div>
-          <Label>Ano</Label>
-          <Input data-testid="input-ano-edit" type="number" {...form.register("ano")} className="mt-1" />
+          <Label>Workflow *</Label>
+          <Controller
+            name="workflow_status"
+            control={form.control}
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger className="mt-1" data-testid="select-workflow-edit"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {WORKFLOW_OPTIONS.map((w) => <SelectItem key={w} value={w}>{WORKFLOW_LABELS[w]}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            )}
+          />
         </div>
       </div>
       <div className="grid grid-cols-2 gap-3">
@@ -191,12 +206,15 @@ export default function NecessidadeDetail() {
           <h1 className="text-xl font-bold text-foreground">Detalhe da Necessidade</h1>
           <p className="text-xs text-muted-foreground">ID #{n.id}</p>
         </div>
-        <div className="ml-auto flex gap-2">
+        <div className="ml-auto flex gap-2 flex-wrap justify-end">
           <span className={`inline-flex items-center px-2.5 py-1 rounded text-xs font-semibold ${MOSCOW_COLORS[n.classificacao_moscow] ?? ""}`}>
             {MOSCOW_LABELS[n.classificacao_moscow] ?? n.classificacao_moscow}
           </span>
           <span className={`inline-flex items-center px-2.5 py-1 rounded text-xs font-semibold ${STATUS_COLORS[n.status] ?? ""}`}>
             {STATUS_LABELS[n.status] ?? n.status}
+          </span>
+          <span className={`inline-flex items-center px-2.5 py-1 rounded text-xs font-semibold ${WORKFLOW_COLORS[n.workflow_status] ?? ""}`}>
+            {WORKFLOW_LABELS[n.workflow_status] ?? n.workflow_status}
           </span>
         </div>
       </div>
@@ -227,6 +245,67 @@ export default function NecessidadeDetail() {
 
       {/* key={n.id} ensures the form fully remounts when navigating between necessidades */}
       <NecessidadeForm key={n.id} n={n} id={id} />
+
+      {/* Audit Log */}
+      <AuditLogSection id={id} />
+    </div>
+  );
+}
+
+type AuditLog = {
+  id: number;
+  entidade: string;
+  entidadeId: number;
+  acao: string;
+  campo: string | null;
+  valor_anterior: string | null;
+  valor_novo: string | null;
+  usuarioNome: string | null;
+  createdAt: string;
+};
+
+function AuditLogSection({ id }: { id: number }) {
+  const { data: logs = [], isLoading } = useQuery<AuditLog[]>({
+    queryKey: ["necessidade", id, "audit"],
+    queryFn: async () => {
+      const res = await fetch(`/api/necessidades/${id}/audit`);
+      if (!res.ok) throw new Error("Erro ao buscar audit log");
+      return res.json();
+    },
+    enabled: !!id,
+  });
+
+  return (
+    <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+      <h2 className="text-sm font-semibold text-foreground border-b border-border pb-2 flex items-center gap-2">
+        <History className="w-4 h-4 text-muted-foreground" />
+        Historico de Alteracoes
+      </h2>
+      {isLoading ? (
+        <div className="h-20 bg-muted animate-pulse rounded" />
+      ) : logs.length === 0 ? (
+        <p className="text-xs text-muted-foreground">Nenhuma alteracao registrada.</p>
+      ) : (
+        <div className="space-y-2 max-h-80 overflow-y-auto">
+          {logs.map((log) => (
+            <div key={log.id} className="text-xs border-l-2 border-muted pl-3 py-1">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <span className="font-medium text-foreground capitalize">{log.acao}</span>
+                <span>&bull;</span>
+                <span>{new Date(log.createdAt).toLocaleString("pt-BR")}</span>
+                {log.usuarioNome && <span>&bull; {log.usuarioNome}</span>}
+              </div>
+              {log.campo && (
+                <p className="text-muted-foreground mt-0.5">
+                  <span className="font-medium">{log.campo}:</span>{" "}
+                  <span className="line-through">{log.valor_anterior ?? "—"}</span>{" "}
+                  &rarr; <span>{log.valor_novo ?? "—"}</span>
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

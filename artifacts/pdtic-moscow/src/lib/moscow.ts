@@ -28,6 +28,24 @@ export const STATUS_COLORS: Record<string, string> = {
   pendente: "bg-yellow-100 text-yellow-800 border border-yellow-200",
 };
 
+export const WORKFLOW_LABELS: Record<string, string> = {
+  rascunho: "Rascunho",
+  enviada: "Enviada",
+  aprovada_dir: "Aprovada Dir.",
+  revisao_cti: "Revisão CTI",
+  finalizada: "Finalizada",
+  devolvida: "Devolvida",
+};
+
+export const WORKFLOW_COLORS: Record<string, string> = {
+  rascunho: "bg-gray-100 text-gray-600 border border-gray-200",
+  enviada: "bg-blue-100 text-blue-800 border border-blue-200",
+  aprovada_dir: "bg-green-100 text-green-800 border border-green-200",
+  revisao_cti: "bg-purple-100 text-purple-800 border border-purple-200",
+  finalizada: "bg-slate-800 text-slate-100 border border-slate-700",
+  devolvida: "bg-amber-100 text-amber-800 border border-amber-200",
+};
+
 export const EIXO_LABELS: Record<string, string> = {
   infraestrutura: "Infraestrutura",
   sistemas: "Sistemas de Informacao",
