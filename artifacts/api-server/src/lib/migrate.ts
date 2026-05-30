@@ -21,6 +21,18 @@ export async function ensureTables(): Promise<void> {
         updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       );
 
+      -- Recriar okrs/kpis/key_results com schema correto se colunas estiverem erradas
+      DO $$
+      BEGIN
+        IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='okrs' AND column_name='titulo') THEN
+          DROP TABLE IF EXISTS key_results CASCADE;
+          DROP TABLE IF EXISTS okrs CASCADE;
+        END IF;
+        IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='kpis' AND column_name='titulo') THEN
+          DROP TABLE IF EXISTS kpis CASCADE;
+        END IF;
+      END $$;
+
       CREATE TABLE IF NOT EXISTS okrs (
         id SERIAL PRIMARY KEY,
         objetivo TEXT NOT NULL,
@@ -56,35 +68,6 @@ export async function ensureTables(): Promise<void> {
         valor_atual TEXT NOT NULL DEFAULT '0',
         status TEXT NOT NULL DEFAULT 'nao_iniciado'
       );
-
-      -- Garantir colunas corretas em okrs
-      ALTER TABLE okrs ADD COLUMN IF NOT EXISTS objetivo TEXT;
-      ALTER TABLE okrs ADD COLUMN IF NOT EXISTS progresso INTEGER DEFAULT 0;
-      ALTER TABLE okrs ADD COLUMN IF NOT EXISTS trimestre TEXT;
-      UPDATE okrs SET objetivo = COALESCE(objetivo, 'Objetivo não definido') WHERE objetivo IS NULL;
-
-      -- Garantir colunas corretas em kpis
-      ALTER TABLE kpis ADD COLUMN IF NOT EXISTS nome TEXT;
-      ALTER TABLE kpis ADD COLUMN IF NOT EXISTS categoria TEXT DEFAULT 'geral';
-      ALTER TABLE kpis ADD COLUMN IF NOT EXISTS valor_atual TEXT DEFAULT '0';
-      ALTER TABLE kpis ADD COLUMN IF NOT EXISTS tendencia TEXT DEFAULT 'stable';
-      ALTER TABLE kpis ADD COLUMN IF NOT EXISTS semaforo TEXT DEFAULT 'verde';
-      ALTER TABLE kpis ADD COLUMN IF NOT EXISTS unidade TEXT DEFAULT '';
-      ALTER TABLE kpis ADD COLUMN IF NOT EXISTS meta TEXT DEFAULT '0';
-      UPDATE kpis SET nome = COALESCE(nome, 'KPI') WHERE nome IS NULL;
-      UPDATE kpis SET categoria = COALESCE(categoria, 'geral') WHERE categoria IS NULL;
-      UPDATE kpis SET meta = COALESCE(meta, '0') WHERE meta IS NULL;
-      UPDATE kpis SET unidade = COALESCE(unidade, '') WHERE unidade IS NULL;
-
-      -- Garantir colunas corretas em key_results
-      ALTER TABLE key_results ADD COLUMN IF NOT EXISTS descricao TEXT;
-      ALTER TABLE key_results ADD COLUMN IF NOT EXISTS valor_atual TEXT DEFAULT '0';
-      ALTER TABLE key_results ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'nao_iniciado';
-      ALTER TABLE key_results ADD COLUMN IF NOT EXISTS meta TEXT DEFAULT '0';
-      ALTER TABLE key_results ADD COLUMN IF NOT EXISTS unidade TEXT DEFAULT '';
-      UPDATE key_results SET descricao = COALESCE(descricao, 'Key Result') WHERE descricao IS NULL;
-      UPDATE key_results SET meta = COALESCE(meta, '0') WHERE meta IS NULL;
-      UPDATE key_results SET unidade = COALESCE(unidade, '') WHERE unidade IS NULL;
 
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
