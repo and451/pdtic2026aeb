@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import {
   useListNecessidades,
@@ -51,6 +51,16 @@ export default function Necessidades() {
   const [showCreate, setShowCreate] = useState(false);
   const [editingCell, setEditingCell] = useState<{ id: number; field: "moscow" | "status" | "workflow" } | null>(null);
   const [editingNum, setEditingNum] = useState<{ id: number; field: "orc_planejado" | "orc_realizado"; value: string } | null>(null);
+
+  // Read ?workflow=xxx from URL on mount
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const wf = url.searchParams.get("workflow");
+    if (wf && WORKFLOW_OPTIONS.includes(wf)) {
+      setFilterWorkflow(wf);
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+  }, []);
 
   const params = {
     ...(filterEixo !== "all" && { eixo: filterEixo }),

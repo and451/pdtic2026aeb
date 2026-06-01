@@ -535,6 +535,10 @@ components:
           type: object
           additionalProperties:
             type: integer
+        por_workflow:
+          type: object
+          additionalProperties:
+            type: integer
         orcamento_total_planejado:
           type: number
         orcamento_total_realizado:

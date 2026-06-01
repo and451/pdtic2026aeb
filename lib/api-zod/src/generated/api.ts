@@ -57,8 +57,8 @@ export const CreateNecessidadeBody = zod.object({
   "classificacao_moscow": zod.string(),
   "status": zod.string(),
   "workflow_status": zod.string().optional(),
-  "orcamento_planejado": zod.number().optional(),
-  "orcamento_realizado": zod.number().optional(),
+  "orcamento_planejado": zod.number().nullish(),
+  "orcamento_realizado": zod.number().nullish(),
   "ano": zod.number().optional(),
   "observacoes": zod.string().optional()
 })
@@ -118,8 +118,8 @@ export const UpdateNecessidadeBody = zod.object({
   "classificacao_moscow": zod.string().optional(),
   "status": zod.string().optional(),
   "workflow_status": zod.string().optional(),
-  "orcamento_planejado": zod.number().optional(),
-  "orcamento_realizado": zod.number().optional(),
+  "orcamento_planejado": zod.number().nullish(),
+  "orcamento_realizado": zod.number().nullish(),
   "ano": zod.number().optional(),
   "observacoes": zod.string().optional()
 })

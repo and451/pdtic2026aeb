@@ -92,6 +92,20 @@ export async function ensureTables(): Promise<void> {
         usuario_nome TEXT,
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       );
+
+      CREATE TABLE IF NOT EXISTS pdtic_ciclos (
+        id SERIAL PRIMARY KEY,
+        numero_sei TEXT NOT NULL,
+        titulo TEXT NOT NULL,
+        descricao TEXT,
+        data_inicio TIMESTAMPTZ NOT NULL,
+        data_conclusao TIMESTAMPTZ,
+        periodo_referencia TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'ativo',
+        ativo BOOLEAN NOT NULL DEFAULT true,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
     `);
     logger.info("Tabelas verificadas/criadas com sucesso");
   } catch (err) {

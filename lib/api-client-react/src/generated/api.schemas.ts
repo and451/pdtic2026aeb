@@ -73,6 +73,7 @@ export interface NecessidadesStats {
   por_status: NecessidadesStatsPorStatus;
   por_moscow: NecessidadesStatsPorMoscow;
   por_eixo: NecessidadesStatsPorEixo;
+  por_workflow: {[key: string]: number};
   orcamento_total_planejado: number;
   orcamento_total_realizado: number;
 }

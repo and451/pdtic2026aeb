@@ -1,7 +1,9 @@
 import { useGetDashboardSummary, useGetNecessidadesStats } from "@workspace/api-client-react";
 import { BarChart, Bar, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { AlertTriangle, CheckCircle2, Clock, DollarSign, Target, BarChart3, Activity } from "lucide-react";
-import { MOSCOW_LABELS, STATUS_LABELS, EIXO_LABELS, formatCurrency, SEMAFORO_COLORS, SEMAFORO_LABELS } from "@/lib/moscow";
+import { AlertTriangle, CheckCircle2, Clock, DollarSign, Target, BarChart3, Activity, FileText, Calendar, ArrowRight, RotateCcw, Send, CheckSquare, Eye, Lock } from "lucide-react";
+import { MOSCOW_LABELS, STATUS_LABELS, EIXO_LABELS, formatCurrency, SEMAFORO_COLORS, SEMAFORO_LABELS, WORKFLOW_LABELS, WORKFLOW_COLORS } from "@/lib/moscow";
+import { useQuery } from "@tanstack/react-query";
+import { Link } from "wouter";
 
 function DonutChart({ data, size = 160 }: { data: { value: number; fill: string }[]; size?: number }) {
   const total = data.reduce((s, d) => s + d.value, 0);
@@ -62,8 +64,17 @@ function StatCard({ label, value, sub, icon: Icon, color = "primary" }: {
 export default function Dashboard() {
   const { data: summary, isLoading: loadingSummary } = useGetDashboardSummary();
   const { data: stats, isLoading: loadingStats } = useGetNecessidadesStats();
+  const { data: cicloAtual, isLoading: loadingCiclo } = useQuery({
+    queryKey: ["ciclo-atual"],
+    queryFn: async () => {
+      const res = await fetch("/api/ciclos/atual");
+      if (res.status === 404) return null;
+      if (!res.ok) throw new Error("Erro ao carregar ciclo");
+      return res.json();
+    },
+  });
 
-  if (loadingSummary || loadingStats) {
+  if (loadingSummary || loadingStats || loadingCiclo) {
     return (
       <div className="p-6 space-y-4">
         {[...Array(8)].map((_, i) => (
@@ -98,6 +109,41 @@ export default function Dashboard() {
         <h1 className="text-xl font-bold text-foreground">Dashboard Executivo</h1>
         <p className="text-sm text-muted-foreground mt-0.5">PDTIC/AEB 2024-2026 — Periodo de referencia: jan/2024 a mai/2026</p>
       </div>
+
+      {/* Ciclo do PDTIC */}
+      {cicloAtual && (
+        <div className="bg-card border border-border rounded-lg p-5">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-lg bg-primary/10 text-primary">
+                <FileText className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-foreground">{cicloAtual.titulo}</h3>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Processo SEI: <span className="font-medium text-foreground">{cicloAtual.numero_sei}</span>
+                  <span className="mx-2">•</span>
+                  Período: {cicloAtual.periodo_referencia}
+                  <span className="mx-2">•</span>
+                  Status: <span className="font-medium text-foreground">{cicloAtual.status === "ativo" ? "Em andamento" : cicloAtual.status}</span>
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1">
+                <Calendar className="w-3.5 h-3.5" />
+                <span>Início: {new Date(cicloAtual.data_inicio).toLocaleDateString("pt-BR")}</span>
+              </div>
+              {cicloAtual.data_conclusao && (
+                <div className="flex items-center gap-1">
+                  <CheckSquare className="w-3.5 h-3.5" />
+                  <span>Conclusão: {new Date(cicloAtual.data_conclusao).toLocaleDateString("pt-BR")}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Top KPI row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -207,6 +253,36 @@ export default function Dashboard() {
             <Bar dataKey="value" fill="hsl(217, 91%, 30%)" radius={[0, 4, 4, 0]} name="Necessidades" />
           </BarChart>
         </ResponsiveContainer>
+      </div>
+
+      {/* Workflow cards */}
+      <div>
+        <h3 className="text-sm font-semibold text-foreground mb-3">Fluxo de Tramitacao das Demandas</h3>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          {[
+            { key: "rascunho", label: "Rascunho", icon: RotateCcw, color: "bg-gray-100 text-gray-700 border-gray-200" },
+            { key: "enviada", label: "Enviada", icon: Send, color: "bg-blue-100 text-blue-700 border-blue-200" },
+            { key: "aprovada_dir", label: "Aprovada Dir.", icon: CheckSquare, color: "bg-green-100 text-green-700 border-green-200" },
+            { key: "revisao_cti", label: "Revisão CTI", icon: Eye, color: "bg-purple-100 text-purple-700 border-purple-200" },
+            { key: "devolvida", label: "Devolvida", icon: ArrowRight, color: "bg-amber-100 text-amber-700 border-amber-200" },
+            { key: "finalizada", label: "Finalizada", icon: Lock, color: "bg-slate-100 text-slate-700 border-slate-200" },
+          ].map((wf) => {
+            const count = stats.por_workflow?.[wf.key] ?? 0;
+            return (
+              <Link key={wf.key} href={`/necessidades?workflow=${wf.key}`}>
+                <div className={`cursor-pointer border rounded-lg p-3 hover:shadow-sm transition-shadow ${wf.color}`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <wf.icon className="w-4 h-4" />
+                      <span className="text-xs font-medium">{wf.label}</span>
+                    </div>
+                    <span className="text-lg font-bold">{count}</span>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
       </div>
 
       {/* OKR + KPI bottom row */}
