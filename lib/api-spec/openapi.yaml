@@ -438,6 +438,9 @@ components:
         status:
           type: string
           description: "atendida | em_andamento | nao_atendida | cancelada | pendente"
+        workflow_status:
+          type: string
+          description: "rascunho | enviada | aprovada_dir | revisao_cti | finalizada | devolvida"
         orcamento_planejado:
           type: ["number", "null"]
         orcamento_realizado:
@@ -472,6 +475,8 @@ components:
           type: string
         status:
           type: string
+        workflow_status:
+          type: string
         orcamento_planejado:
           type: number
         orcamento_realizado:
@@ -494,6 +499,8 @@ components:
         classificacao_moscow:
           type: string
         status:
+          type: string
+        workflow_status:
           type: string
         orcamento_planejado:
           type: number

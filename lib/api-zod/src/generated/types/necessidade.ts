@@ -17,6 +17,8 @@ export interface Necessidade {
   classificacao_moscow: string;
   /** atendida | em_andamento | nao_atendida | cancelada | pendente */
   status: string;
+  /** rascunho | enviada | aprovada_dir | revisao_cti | finalizada | devolvida */
+  workflow_status?: string;
   /** @nullable */
   orcamento_planejado?: number | null;
   /** @nullable */

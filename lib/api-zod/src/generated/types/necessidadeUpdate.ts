@@ -13,6 +13,7 @@ export interface NecessidadeUpdate {
   eixo?: string;
   classificacao_moscow?: string;
   status?: string;
+  workflow_status?: string;
   orcamento_planejado?: number;
   orcamento_realizado?: number;
   ano?: number;

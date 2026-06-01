@@ -50,6 +50,7 @@ export default function Necessidades() {
   const [filterWorkflow, setFilterWorkflow] = useState("all");
   const [showCreate, setShowCreate] = useState(false);
   const [editingCell, setEditingCell] = useState<{ id: number; field: "moscow" | "status" | "workflow" } | null>(null);
+  const [editingNum, setEditingNum] = useState<{ id: number; field: "orc_planejado" | "orc_realizado"; value: string } | null>(null);
 
   const params = {
     ...(filterEixo !== "all" && { eixo: filterEixo }),
@@ -332,20 +333,71 @@ export default function Necessidades() {
                       </Select>
                     ) : (
                       <button
-                        className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium cursor-pointer hover:opacity-80 ${WORKFLOW_COLORS[n.workflow_status] ?? ""}`}
+                        className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium cursor-pointer hover:opacity-80 ${WORKFLOW_COLORS[n.workflow_status ?? ""] ?? ""}`}
                         onClick={() => setEditingCell({ id: n.id, field: "workflow" })}
                       >
-                        {WORKFLOW_LABELS[n.workflow_status] ?? n.workflow_status}
+                        {WORKFLOW_LABELS[n.workflow_status ?? ""] ?? n.workflow_status}
                       </button>
                     )}
                   </td>
-                  <td className="px-4 py-3 hidden lg:table-cell text-muted-foreground text-xs">
-                    {formatCurrency(n.orcamento_planejado)}
+                  <td className="px-4 py-3 hidden lg:table-cell">
+                    {editingNum?.id === n.id && editingNum?.field === "orc_planejado" ? (
+                      <Input
+                        autoFocus
+                        type="number"
+                        step="0.01"
+                        className="w-32 h-7 text-xs px-2 py-0"
+                        value={editingNum.value}
+                        onChange={(e) => setEditingNum({ ...editingNum, value: e.target.value })}
+                        onBlur={() => {
+                          const val = parseFloat(editingNum.value);
+                          if (!isNaN(val) && val !== (n.orcamento_planejado ?? 0)) {
+                            updateMut.mutate(
+                              { id: n.id, data: { orcamento_planejado: val } },
+                              { onSuccess: () => { toast({ title: "Orcamento atualizado" }); invalidate(); }, onSettled: () => setEditingNum(null) }
+                            );
+                          } else { setEditingNum(null); }
+                        }}
+                        onKeyDown={(e) => { if (e.key === "Escape") setEditingNum(null); }}
+                      />
+                    ) : (
+                      <button
+                        className="text-xs text-muted-foreground hover:text-foreground hover:underline cursor-pointer"
+                        onClick={() => setEditingNum({ id: n.id, field: "orc_planejado", value: (n.orcamento_planejado ?? "").toString() })}
+                      >
+                        {formatCurrency(n.orcamento_planejado) || "—"}
+                      </button>
+                    )}
                   </td>
-                  <td className="px-4 py-3 hidden xl:table-cell text-xs">
-                    {n.orcamento_realizado
-                      ? <span className="font-medium text-foreground">{formatCurrency(n.orcamento_realizado)}</span>
-                      : <span className="text-muted-foreground">—</span>}
+                  <td className="px-4 py-3 hidden xl:table-cell">
+                    {editingNum?.id === n.id && editingNum?.field === "orc_realizado" ? (
+                      <Input
+                        autoFocus
+                        type="number"
+                        step="0.01"
+                        className="w-32 h-7 text-xs px-2 py-0"
+                        value={editingNum.value}
+                        onChange={(e) => setEditingNum({ ...editingNum, value: e.target.value })}
+                        onBlur={() => {
+                          const val = parseFloat(editingNum.value);
+                          const current = n.orcamento_realizado ?? 0;
+                          if (!isNaN(val) && val !== current) {
+                            updateMut.mutate(
+                              { id: n.id, data: { orcamento_realizado: val } },
+                              { onSuccess: () => { toast({ title: "Valor atualizado" }); invalidate(); }, onSettled: () => setEditingNum(null) }
+                            );
+                          } else { setEditingNum(null); }
+                        }}
+                        onKeyDown={(e) => { if (e.key === "Escape") setEditingNum(null); }}
+                      />
+                    ) : (
+                      <button
+                        className="text-xs text-foreground font-medium hover:underline cursor-pointer"
+                        onClick={() => setEditingNum({ id: n.id, field: "orc_realizado", value: (n.orcamento_realizado ?? "").toString() })}
+                      >
+                        {n.orcamento_realizado ? formatCurrency(n.orcamento_realizado) : <span className="text-muted-foreground">—</span>}
+                      </button>
+                    )}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1 justify-end">
