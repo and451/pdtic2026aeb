@@ -2,7 +2,7 @@ import * as React from "react";
 import {
   BookOpen, ClipboardList, Target, Users, ShieldCheck, BarChart3,
   FileText, CheckCircle, AlertTriangle, Lock, ArrowRight,
-  Lightbulb, TrendingUp, Wallet, ListChecks
+  Lightbulb, TrendingUp, Wallet, ListChecks, Edit2
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
