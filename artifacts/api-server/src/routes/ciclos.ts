@@ -18,4 +18,15 @@ router.get("/ciclos/atual", async (_req, res): Promise<void> => {
   res.json(rows[0]);
 });
 
+router.post("/ciclos", async (req, res): Promise<void> => {
+  const { numero_sei, titulo, descricao, data_inicio, data_conclusao, periodo_referencia, status, ativo } = req.body;
+  const rows = await db.insert(ciclosTable).values({
+    numero_sei, titulo, descricao,
+    data_inicio: new Date(data_inicio),
+    data_conclusao: data_conclusao ? new Date(data_conclusao) : null,
+    periodo_referencia, status, ativo
+  }).returning();
+  res.status(201).json(rows[0]);
+});
+
 export default router;
