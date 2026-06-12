@@ -24,6 +24,8 @@ export interface Necessidade {
   /** @nullable */
   orcamento_realizado?: number | null;
   /** @nullable */
+  unidade_requisitante?: string | null;
+  /** @nullable */
   ano?: number | null;
   /** @nullable */
   observacoes?: string | null;

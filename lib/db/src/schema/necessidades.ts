@@ -12,6 +12,7 @@ export const necessidadesTable = pgTable("necessidades", {
   workflow_status: text("workflow_status").notNull().default("rascunho"),
   orcamento_planejado: numeric("orcamento_planejado", { precision: 15, scale: 2 }),
   orcamento_realizado: numeric("orcamento_realizado", { precision: 15, scale: 2 }),
+  unidade_requisitante: text("unidade_requisitante"),
   ano: integer("ano"),
   observacoes: text("observacoes"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

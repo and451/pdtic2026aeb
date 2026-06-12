@@ -171,7 +171,7 @@ router.patch("/necessidades/:id", async (req, res): Promise<void> => {
   const [row] = await db.update(necessidadesTable).set(updateData).where(eq(necessidadesTable.id, params.data.id)).returning();
 
   const user = req.user;
-  const fieldsToAudit = ["titulo", "descricao", "eixo", "classificacao_moscow", "status", "workflow_status", "orcamento_planejado", "orcamento_realizado", "ano", "observacoes"] as const;
+  const fieldsToAudit = ["titulo", "descricao", "eixo", "classificacao_moscow", "status", "workflow_status", "unidade_requisitante", "orcamento_planejado", "orcamento_realizado", "ano", "observacoes"] as const;
   for (const field of fieldsToAudit) {
     const key = field as keyof typeof parsed.data;
     if (key in parsed.data && parsed.data[key] !== undefined) {

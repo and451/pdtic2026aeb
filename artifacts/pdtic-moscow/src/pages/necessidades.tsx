@@ -51,6 +51,7 @@ export default function Necessidades() {
   const [showCreate, setShowCreate] = useState(false);
   const [editingCell, setEditingCell] = useState<{ id: number; field: "moscow" | "status" | "workflow" } | null>(null);
   const [editingNum, setEditingNum] = useState<{ id: number; field: "orc_planejado" | "orc_realizado"; value: string } | null>(null);
+  const [editingText, setEditingText] = useState<{ id: number; field: "unidade_requisitante"; value: string } | null>(null);
 
   // Read ?workflow=xxx from URL on mount
   useEffect(() => {
@@ -208,6 +209,7 @@ export default function Necessidades() {
             <thead>
               <tr className="border-b border-border bg-muted/30">
                 <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Necessidade</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden lg:table-cell">Unidade Requisitante</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden md:table-cell">Eixo</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">MoSCoW</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status</th>
@@ -223,6 +225,35 @@ export default function Necessidades() {
                   <td className="px-4 py-3">
                     <p className="font-medium text-foreground line-clamp-1">{n.titulo}</p>
                     {n.descricao && <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{n.descricao}</p>}
+                  </td>
+                  <td className="px-4 py-3 hidden lg:table-cell">
+                    {editingText?.id === n.id && editingText.field === "unidade_requisitante" ? (
+                      <Input
+                        autoFocus
+                        type="text"
+                        className="w-40 h-7 text-xs px-2 py-0"
+                        value={editingText.value}
+                        onChange={(e) => setEditingText({ ...editingText, value: e.target.value })}
+                        onBlur={() => {
+                          const val = editingText.value.trim();
+                          const current = n.unidade_requisitante ?? "";
+                          if (val !== current) {
+                            updateMut.mutate(
+                              { id: n.id, data: { unidade_requisitante: val || undefined } },
+                              { onSuccess: () => { toast({ title: "Unidade atualizada" }); invalidate(); }, onSettled: () => setEditingText(null) }
+                            );
+                          } else { setEditingText(null); }
+                        }}
+                        onKeyDown={(e) => { if (e.key === "Escape") setEditingText(null); if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }}
+                      />
+                    ) : (
+                      <button
+                        className="text-xs text-muted-foreground hover:text-foreground hover:underline cursor-pointer"
+                        onClick={() => setEditingText({ id: n.id, field: "unidade_requisitante", value: n.unidade_requisitante ?? "" })}
+                      >
+                        {n.unidade_requisitante || "—"}
+                      </button>
+                    )}
                   </td>
                   <td className="px-4 py-3 hidden md:table-cell">
                     <span className="text-xs text-muted-foreground">{EIXO_LABELS[n.eixo] ?? n.eixo}</span>
