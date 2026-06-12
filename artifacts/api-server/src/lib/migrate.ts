@@ -21,6 +21,8 @@ export async function ensureTables(): Promise<void> {
         updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       );
 
+      ALTER TABLE necessidades ADD COLUMN IF NOT EXISTS unidade_requisitante TEXT;
+
       -- Recriar okrs/kpis/key_results com schema correto se colunas estiverem erradas
       DO $$
       BEGIN
