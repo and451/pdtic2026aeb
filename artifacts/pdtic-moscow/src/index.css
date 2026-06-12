@@ -130,51 +130,52 @@
   --radius: 0.3rem; 
 }
 
+/* DARK MODE — tema espacial AEB: azul-noite profundo com acentos ciano */
 .dark {
-  --background: 222 47% 6%;
-  --foreground: 210 40% 98%;
-  
-  --card: 222 47% 8%;
-  --card-foreground: 210 40% 98%;
-  --card-border: 217 32% 17%;
-  
-  --popover: 222 47% 8%;
-  --popover-foreground: 210 40% 98%;
-  --popover-border: 217 32% 17%;
-  
-  --primary: 217 91% 60%;
-  --primary-foreground: 222 47% 11%;
-  
-  --secondary: 217 32% 17%;
-  --secondary-foreground: 210 40% 98%;
-  
-  --muted: 217 32% 17%;
-  --muted-foreground: 215 20.2% 65.1%;
-  
-  --accent: 217 32% 17%;
-  --accent-foreground: 210 40% 98%;
-  
-  --destructive: 346 87% 43%;
-  --destructive-foreground: 210 40% 98%;
-  
-  --border: 217 32% 17%;
-  --input: 217 32% 17%;
-  --ring: 224 71% 45%;
+  --background: 225 50% 4%;
+  --foreground: 210 40% 96%;
 
-  --chart-1: 217 91% 60%;
+  --card: 224 45% 7%;
+  --card-foreground: 210 40% 96%;
+  --card-border: 220 35% 14%;
+
+  --popover: 224 45% 7%;
+  --popover-foreground: 210 40% 96%;
+  --popover-border: 220 35% 14%;
+
+  --primary: 190 95% 55%; /* ciano aurora */
+  --primary-foreground: 225 50% 6%;
+
+  --secondary: 220 35% 13%;
+  --secondary-foreground: 210 40% 96%;
+
+  --muted: 220 35% 12%;
+  --muted-foreground: 215 20% 62%;
+
+  --accent: 220 35% 13%;
+  --accent-foreground: 210 40% 96%;
+
+  --destructive: 346 87% 50%;
+  --destructive-foreground: 210 40% 98%;
+
+  --border: 220 35% 14%;
+  --input: 220 35% 16%;
+  --ring: 190 95% 45%;
+
+  --chart-1: 190 95% 55%;
   --chart-2: 142 71% 45%;
   --chart-3: 35 92% 53%;
-  --chart-4: 346 87% 43%;
+  --chart-4: 346 87% 50%;
   --chart-5: 215 20% 65%;
 
-  --sidebar: 222 47% 6%;
-  --sidebar-foreground: 210 40% 98%;
-  --sidebar-border: 217 32% 17%;
-  --sidebar-primary: 217 91% 60%;
-  --sidebar-primary-foreground: 222 47% 11%;
-  --sidebar-accent: 217 32% 17%;
-  --sidebar-accent-foreground: 210 40% 98%;
-  --sidebar-ring: 224 71% 45%;
+  --sidebar: 226 55% 3%;
+  --sidebar-foreground: 210 40% 96%;
+  --sidebar-border: 220 35% 12%;
+  --sidebar-primary: 190 95% 50%;
+  --sidebar-primary-foreground: 225 50% 6%;
+  --sidebar-accent: 220 35% 12%;
+  --sidebar-accent-foreground: 210 40% 96%;
+  --sidebar-ring: 190 95% 45%;
 }
 
 @layer base {
@@ -184,4 +185,27 @@
   body {
     @apply font-sans antialiased bg-background text-foreground;
   }
+}
+
+/* Céu estrelado sutil para headers e sidebar (visível só no dark) */
+.dark .starfield {
+  background-image:
+    radial-gradient(1px 1px at 12% 25%, rgba(255,255,255,.55) 50%, transparent 50%),
+    radial-gradient(1px 1px at 28% 70%, rgba(255,255,255,.35) 50%, transparent 50%),
+    radial-gradient(1.5px 1.5px at 45% 15%, rgba(160,225,255,.6) 50%, transparent 50%),
+    radial-gradient(1px 1px at 62% 55%, rgba(255,255,255,.4) 50%, transparent 50%),
+    radial-gradient(1px 1px at 75% 30%, rgba(255,255,255,.5) 50%, transparent 50%),
+    radial-gradient(1.5px 1.5px at 88% 75%, rgba(160,225,255,.45) 50%, transparent 50%),
+    radial-gradient(1px 1px at 95% 10%, rgba(255,255,255,.35) 50%, transparent 50%),
+    radial-gradient(1px 1px at 8% 85%, rgba(255,255,255,.3) 50%, transparent 50%),
+    radial-gradient(1px 1px at 55% 90%, rgba(160,225,255,.35) 50%, transparent 50%);
+}
+
+/* Ponto pulsante do badge de ciclo ativo */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(74, 222, 128, .5); }
+  50% { opacity: .7; box-shadow: 0 0 0 4px rgba(74, 222, 128, 0); }
+}
+.pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
 }

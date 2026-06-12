@@ -1,7 +1,7 @@
 import { useRoute, useLocation } from "wouter";
 import { useGetNecessidade, useUpdateNecessidade, getGetNecessidadeQueryKey, getListNecessidadesQueryKey, getGetNecessidadesStatsQueryKey, getGetDashboardSummaryQueryKey } from "@workspace/api-client-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Save, History } from "lucide-react";
+import { ArrowLeft, Save, History, Check, CornerDownLeft } from "lucide-react";
 import { useForm, Controller } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,57 @@ type FormData = {
 };
 
 type Necessidade = NonNullable<ReturnType<typeof useGetNecessidade>["data"]>;
+
+/* Timeline horizontal do fluxo de tramitação, estilo "mission timeline" */
+const TIMELINE_STEPS = ["rascunho", "enviada", "aprovada_dir", "revisao_cti", "finalizada"];
+
+function WorkflowTimeline({ current }: { current: string }) {
+  const isDevolvida = current === "devolvida";
+  // Devolvida volta para o estágio de rascunho/reenvio
+  const currentIdx = isDevolvida ? 0 : TIMELINE_STEPS.indexOf(current);
+
+  return (
+    <div className="bg-card border border-border rounded-lg p-5">
+      <h2 className="text-sm font-semibold text-foreground mb-5">Fluxo de Tramitação</h2>
+      <div className="flex items-start">
+        {TIMELINE_STEPS.map((step, i) => {
+          const done = i < currentIdx;
+          const active = i === currentIdx && !isDevolvida;
+          const isLast = i === TIMELINE_STEPS.length - 1;
+          return (
+            <div key={step} className={`flex items-start ${isLast ? "" : "flex-1"}`}>
+              <div className="flex flex-col items-center w-16 shrink-0">
+                <div
+                  className={`w-7 h-7 rounded-full flex items-center justify-center border-2 transition-colors ${
+                    done
+                      ? "bg-primary border-primary text-primary-foreground"
+                      : active
+                      ? "border-primary text-primary bg-primary/10 ring-4 ring-primary/15"
+                      : "border-border text-muted-foreground bg-muted/30"
+                  }`}
+                >
+                  {done ? <Check className="w-3.5 h-3.5" /> : <span className="text-[10px] font-bold">{i + 1}</span>}
+                </div>
+                <span className={`mt-2 text-[10px] font-medium text-center leading-tight ${active ? "text-primary" : done ? "text-foreground" : "text-muted-foreground"}`}>
+                  {WORKFLOW_LABELS[step]}
+                </span>
+              </div>
+              {!isLast && (
+                <div className={`flex-1 h-0.5 mt-3.5 -mx-4 ${done ? "bg-primary" : "bg-border"}`} />
+              )}
+            </div>
+          );
+        })}
+      </div>
+      {isDevolvida && (
+        <div className="mt-4 flex items-center gap-2 text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/25 rounded-md px-3 py-2">
+          <CornerDownLeft className="w-3.5 h-3.5 shrink-0" />
+          Demanda devolvida — necessita ajustes e reenvio para nova tramitação.
+        </div>
+      )}
+    </div>
+  );
+}
 
 function NecessidadeForm({ n, id }: { n: Necessidade; id: number }) {
   const { toast } = useToast();
@@ -218,6 +269,9 @@ export default function NecessidadeDetail() {
           </span>
         </div>
       </div>
+
+      {/* Workflow timeline */}
+      <WorkflowTimeline current={n.workflow_status ?? "rascunho"} />
 
       {/* Budget summary cards */}
       <div className="grid grid-cols-3 gap-4">

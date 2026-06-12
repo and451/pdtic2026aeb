@@ -19,6 +19,10 @@ export interface Necessidade {
     classificacao_moscow: string;
     /** atendida | em_andamento | nao_atendida | cancelada | pendente */
     status: string;
+    /** rascunho | enviada | aprovada_dir | revisao_cti | finalizada | devolvida */
+    workflow_status?: string;
+    /** @nullable */
+    unidade_requisitante?: string | null;
     /** @nullable */
     orcamento_planejado?: number | null;
     /** @nullable */
@@ -37,6 +41,8 @@ export interface NecessidadeInput {
     eixo: string;
     classificacao_moscow: string;
     status: string;
+    workflow_status?: string;
+    unidade_requisitante?: string;
     orcamento_planejado?: number;
     orcamento_realizado?: number;
     ano?: number;
@@ -49,6 +55,8 @@ export interface NecessidadeUpdate {
     eixo?: string;
     classificacao_moscow?: string;
     status?: string;
+    workflow_status?: string;
+    unidade_requisitante?: string;
     orcamento_planejado?: number;
     orcamento_realizado?: number;
     ano?: number;
@@ -68,6 +76,9 @@ export interface NecessidadesStats {
     por_status: NecessidadesStatsPorStatus;
     por_moscow: NecessidadesStatsPorMoscow;
     por_eixo: NecessidadesStatsPorEixo;
+    por_workflow: {
+        [key: string]: number;
+    };
     orcamento_total_planejado: number;
     orcamento_total_realizado: number;
 }

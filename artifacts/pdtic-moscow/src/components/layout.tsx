@@ -22,7 +22,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     <div className="flex h-screen bg-background overflow-hidden">
       {/* Sidebar */}
       <aside className={cn(
-        "flex flex-col w-64 bg-sidebar text-sidebar-foreground border-r border-sidebar-border shrink-0 transition-transform duration-200",
+        "starfield flex flex-col w-64 bg-sidebar text-sidebar-foreground border-r border-sidebar-border shrink-0 transition-transform duration-200",
         "fixed inset-y-0 left-0 z-50 lg:static lg:translate-x-0",
         mobileOpen ? "translate-x-0" : "-translate-x-full"
       )}>

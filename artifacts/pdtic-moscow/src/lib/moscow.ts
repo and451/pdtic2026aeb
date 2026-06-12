@@ -6,10 +6,10 @@ export const MOSCOW_LABELS: Record<string, string> = {
 };
 
 export const MOSCOW_COLORS: Record<string, string> = {
-  must: "bg-red-100 text-red-800 border border-red-200",
-  should: "bg-orange-100 text-orange-800 border border-orange-200",
-  could: "bg-blue-100 text-blue-800 border border-blue-200",
-  wont: "bg-gray-100 text-gray-600 border border-gray-200",
+  must: "bg-red-100 text-red-800 border border-red-200 dark:bg-red-500/15 dark:text-red-300 dark:border-red-500/30",
+  should: "bg-orange-100 text-orange-800 border border-orange-200 dark:bg-orange-500/15 dark:text-orange-300 dark:border-orange-500/30",
+  could: "bg-blue-100 text-blue-800 border border-blue-200 dark:bg-cyan-500/15 dark:text-cyan-300 dark:border-cyan-500/30",
+  wont: "bg-gray-100 text-gray-600 border border-gray-200 dark:bg-gray-500/15 dark:text-gray-400 dark:border-gray-500/30",
 };
 
 export const STATUS_LABELS: Record<string, string> = {
@@ -21,11 +21,11 @@ export const STATUS_LABELS: Record<string, string> = {
 };
 
 export const STATUS_COLORS: Record<string, string> = {
-  atendida: "bg-green-100 text-green-800 border border-green-200",
-  em_andamento: "bg-blue-100 text-blue-800 border border-blue-200",
-  nao_atendida: "bg-red-100 text-red-800 border border-red-200",
-  cancelada: "bg-gray-100 text-gray-600 border border-gray-200",
-  pendente: "bg-yellow-100 text-yellow-800 border border-yellow-200",
+  atendida: "bg-green-100 text-green-800 border border-green-200 dark:bg-green-500/15 dark:text-green-300 dark:border-green-500/30",
+  em_andamento: "bg-blue-100 text-blue-800 border border-blue-200 dark:bg-cyan-500/15 dark:text-cyan-300 dark:border-cyan-500/30",
+  nao_atendida: "bg-red-100 text-red-800 border border-red-200 dark:bg-red-500/15 dark:text-red-300 dark:border-red-500/30",
+  cancelada: "bg-gray-100 text-gray-600 border border-gray-200 dark:bg-gray-500/15 dark:text-gray-400 dark:border-gray-500/30",
+  pendente: "bg-yellow-100 text-yellow-800 border border-yellow-200 dark:bg-yellow-500/15 dark:text-yellow-300 dark:border-yellow-500/30",
 };
 
 export const WORKFLOW_LABELS: Record<string, string> = {
@@ -38,12 +38,12 @@ export const WORKFLOW_LABELS: Record<string, string> = {
 };
 
 export const WORKFLOW_COLORS: Record<string, string> = {
-  rascunho: "bg-gray-100 text-gray-600 border border-gray-200",
-  enviada: "bg-blue-100 text-blue-800 border border-blue-200",
-  aprovada_dir: "bg-green-100 text-green-800 border border-green-200",
-  revisao_cti: "bg-purple-100 text-purple-800 border border-purple-200",
-  finalizada: "bg-slate-800 text-slate-100 border border-slate-700",
-  devolvida: "bg-amber-100 text-amber-800 border border-amber-200",
+  rascunho: "bg-gray-100 text-gray-600 border border-gray-200 dark:bg-gray-500/15 dark:text-gray-400 dark:border-gray-500/30",
+  enviada: "bg-blue-100 text-blue-800 border border-blue-200 dark:bg-cyan-500/15 dark:text-cyan-300 dark:border-cyan-500/30",
+  aprovada_dir: "bg-green-100 text-green-800 border border-green-200 dark:bg-green-500/15 dark:text-green-300 dark:border-green-500/30",
+  revisao_cti: "bg-purple-100 text-purple-800 border border-purple-200 dark:bg-purple-500/15 dark:text-purple-300 dark:border-purple-500/30",
+  finalizada: "bg-slate-800 text-slate-100 border border-slate-700 dark:bg-slate-200/90 dark:text-slate-900 dark:border-slate-300",
+  devolvida: "bg-amber-100 text-amber-800 border border-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-500/30",
 };
 
 export const EIXO_LABELS: Record<string, string> = {

@@ -41,23 +41,49 @@ function StatCard({ label, value, sub, icon: Icon, color = "primary" }: {
 }) {
   const colors: Record<string, string> = {
     primary: "text-primary bg-primary/10",
-    green: "text-green-600 bg-green-50",
-    amber: "text-amber-600 bg-amber-50",
-    red: "text-red-600 bg-red-50",
+    green: "text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-500/10",
+    amber: "text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-500/10",
+    red: "text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-500/10",
   };
   return (
-    <div className="bg-card border border-border rounded-lg p-4" data-testid="card-stat">
+    <div className="bg-card border border-border rounded-lg p-5" data-testid="card-stat">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</p>
-          <p className="text-2xl font-bold text-foreground mt-1">{value}</p>
-          {sub && <p className="text-xs text-muted-foreground mt-0.5">{sub}</p>}
+          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.15em]">{label}</p>
+          <p className="text-4xl font-extralight text-foreground mt-2 tabular-nums tracking-tight">{value}</p>
+          {sub && <p className="text-xs text-muted-foreground mt-1.5">{sub}</p>}
         </div>
         <div className={`p-2 rounded-lg ${colors[color]}`}>
           <Icon className="w-5 h-5" />
         </div>
       </div>
     </div>
+  );
+}
+
+/* Planeta decorativo em SVG — identidade AEB no header do dashboard */
+function PlanetDecor() {
+  return (
+    <svg viewBox="0 0 200 200" className="w-44 h-44 md:w-56 md:h-56" aria-hidden="true">
+      <defs>
+        <radialGradient id="planetGrad" cx="35%" cy="30%" r="80%">
+          <stop offset="0%" stopColor="hsl(195, 80%, 35%)" />
+          <stop offset="55%" stopColor="hsl(215, 70%, 18%)" />
+          <stop offset="100%" stopColor="hsl(225, 60%, 8%)" />
+        </radialGradient>
+        <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="hsl(190, 95%, 55%)" stopOpacity="0" />
+          <stop offset="50%" stopColor="hsl(190, 95%, 55%)" stopOpacity=".6" />
+          <stop offset="100%" stopColor="hsl(190, 95%, 55%)" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <ellipse cx="100" cy="100" rx="92" ry="26" fill="none" stroke="url(#ringGrad)" strokeWidth="1.5" transform="rotate(-18 100 100)" />
+      <circle cx="100" cy="100" r="56" fill="url(#planetGrad)" />
+      <ellipse cx="100" cy="100" rx="92" ry="26" fill="none" stroke="url(#ringGrad)" strokeWidth="2.5" transform="rotate(-18 100 100)" strokeDasharray="140 150" strokeDashoffset="-10" />
+      <circle cx="82" cy="82" r="40" fill="white" opacity=".04" />
+      <circle cx="158" cy="52" r="3" fill="hsl(25, 90%, 60%)" opacity=".8" />
+      <circle cx="38" cy="148" r="2" fill="hsl(190, 95%, 70%)" opacity=".7" />
+    </svg>
   );
 }
 
@@ -104,10 +130,21 @@ export default function Dashboard() {
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
-      {/* Header */}
-      <div>
-        <h1 className="text-xl font-bold text-foreground">Dashboard Executivo</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">PDTIC/AEB 2024-2026 — Periodo de referencia: jan/2024 a mai/2026</p>
+      {/* Header hero — céu estrelado com planeta decorativo */}
+      <div className="starfield relative overflow-hidden rounded-xl border border-border bg-gradient-to-br from-card via-card to-primary/5 px-6 py-6">
+        <div className="absolute -right-8 -top-10 opacity-60 pointer-events-none hidden sm:block">
+          <PlanetDecor />
+        </div>
+        <div className="relative">
+          {cicloAtual && (
+            <span className="inline-flex items-center gap-2 rounded-full border border-green-500/30 bg-green-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-green-600 dark:text-green-400 mb-3">
+              <span className="pulse-dot w-1.5 h-1.5 rounded-full bg-green-500" />
+              {cicloAtual.status === "ativo" ? "Ciclo Ativo" : cicloAtual.status} • {cicloAtual.periodo_referencia}
+            </span>
+          )}
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">Dashboard Executivo</h1>
+          <p className="text-sm text-muted-foreground mt-1">PDTIC/AEB 2024-2026 — Periodo de referencia: jan/2024 a mai/2026</p>
+        </div>
       </div>
 
       {/* Ciclo do PDTIC */}
@@ -173,22 +210,22 @@ export default function Dashboard() {
 
       {/* Budget row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-card border border-border rounded-lg p-4" data-testid="card-orcamento">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Orcamento Planejado (Total)</p>
-          <p className="text-2xl font-bold text-foreground mt-1">{formatCurrency(summary.orcamento_planejado_total)}</p>
-          <p className="text-xs text-muted-foreground mt-0.5">Acumulado 2024-2025</p>
+        <div className="bg-card border border-border rounded-lg p-5" data-testid="card-orcamento">
+          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.15em]">Orcamento Planejado (Total)</p>
+          <p className="text-3xl font-extralight text-foreground mt-2 tabular-nums tracking-tight">{formatCurrency(summary.orcamento_planejado_total)}</p>
+          <p className="text-xs text-muted-foreground mt-1.5">Acumulado 2024-2025</p>
         </div>
-        <div className="bg-card border border-border rounded-lg p-4">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Orcamento Realizado</p>
-          <p className="text-2xl font-bold text-foreground mt-1">{formatCurrency(summary.orcamento_realizado_total)}</p>
-          <p className="text-xs text-muted-foreground mt-0.5">Efetivamente executado</p>
+        <div className="bg-card border border-border rounded-lg p-5">
+          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.15em]">Orcamento Realizado</p>
+          <p className="text-3xl font-extralight text-foreground mt-2 tabular-nums tracking-tight">{formatCurrency(summary.orcamento_realizado_total)}</p>
+          <p className="text-xs text-muted-foreground mt-1.5">Efetivamente executado</p>
         </div>
-        <div className="bg-card border border-border rounded-lg p-4">
+        <div className="bg-card border border-border rounded-lg p-5">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Execucao Orcamentaria</p>
-              <p className="text-2xl font-bold text-foreground mt-1">{orcPct}%</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Do total planejado</p>
+              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.15em]">Execucao Orcamentaria</p>
+              <p className="text-3xl font-extralight text-foreground mt-2 tabular-nums tracking-tight">{orcPct}%</p>
+              <p className="text-xs text-muted-foreground mt-1.5">Do total planejado</p>
             </div>
             <DollarSign className={`w-5 h-5 mt-1 ${orcPct >= 85 ? "text-green-600" : orcPct >= 70 ? "text-amber-600" : "text-red-600"}`} />
           </div>
@@ -250,7 +287,7 @@ export default function Dashboard() {
             <XAxis type="number" tick={{ fontSize: 11 }} />
             <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={180} />
             <Tooltip />
-            <Bar dataKey="value" fill="hsl(217, 91%, 30%)" radius={[0, 4, 4, 0]} name="Necessidades" />
+            <Bar dataKey="value" fill="hsl(var(--chart-1))" radius={[0, 4, 4, 0]} name="Necessidades" />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -260,12 +297,12 @@ export default function Dashboard() {
         <h3 className="text-sm font-semibold text-foreground mb-3">Fluxo de Tramitacao das Demandas</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           {[
-            { key: "rascunho", label: "Rascunho", icon: RotateCcw, color: "bg-gray-100 text-gray-700 border-gray-200" },
-            { key: "enviada", label: "Enviada", icon: Send, color: "bg-blue-100 text-blue-700 border-blue-200" },
-            { key: "aprovada_dir", label: "Aprovada Dir.", icon: CheckSquare, color: "bg-green-100 text-green-700 border-green-200" },
-            { key: "revisao_cti", label: "Revisão CTI", icon: Eye, color: "bg-purple-100 text-purple-700 border-purple-200" },
-            { key: "devolvida", label: "Devolvida", icon: ArrowRight, color: "bg-amber-100 text-amber-700 border-amber-200" },
-            { key: "finalizada", label: "Finalizada", icon: Lock, color: "bg-slate-100 text-slate-700 border-slate-200" },
+            { key: "rascunho", label: "Rascunho", icon: RotateCcw, color: "bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-500/10 dark:text-gray-300 dark:border-gray-500/25" },
+            { key: "enviada", label: "Enviada", icon: Send, color: "bg-blue-100 text-blue-700 border-blue-200 dark:bg-cyan-500/10 dark:text-cyan-300 dark:border-cyan-500/25" },
+            { key: "aprovada_dir", label: "Aprovada Dir.", icon: CheckSquare, color: "bg-green-100 text-green-700 border-green-200 dark:bg-green-500/10 dark:text-green-300 dark:border-green-500/25" },
+            { key: "revisao_cti", label: "Revisão CTI", icon: Eye, color: "bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-500/10 dark:text-purple-300 dark:border-purple-500/25" },
+            { key: "devolvida", label: "Devolvida", icon: ArrowRight, color: "bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-300 dark:border-amber-500/25" },
+            { key: "finalizada", label: "Finalizada", icon: Lock, color: "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-500/10 dark:text-slate-300 dark:border-slate-500/25" },
           ].map((wf) => {
             const count = stats.por_workflow?.[wf.key] ?? 0;
             return (
