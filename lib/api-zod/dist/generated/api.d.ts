@@ -40,6 +40,8 @@ export declare const ListNecessidadesResponseItem: zod.ZodObject<{
     eixo: zod.ZodString;
     classificacao_moscow: zod.ZodString;
     status: zod.ZodString;
+    workflow_status: zod.ZodOptional<zod.ZodString>;
+    unidade_requisitante: zod.ZodOptional<zod.ZodNullable<zod.ZodString>>;
     orcamento_planejado: zod.ZodOptional<zod.ZodNullable<zod.ZodNumber>>;
     orcamento_realizado: zod.ZodOptional<zod.ZodNullable<zod.ZodNumber>>;
     ano: zod.ZodOptional<zod.ZodNullable<zod.ZodNumber>>;
@@ -55,6 +57,8 @@ export declare const ListNecessidadesResponseItem: zod.ZodObject<{
     createdAt: Date;
     updatedAt: Date;
     descricao?: string | null | undefined;
+    workflow_status?: string | undefined;
+    unidade_requisitante?: string | null | undefined;
     orcamento_planejado?: number | null | undefined;
     orcamento_realizado?: number | null | undefined;
     ano?: number | null | undefined;
@@ -68,6 +72,8 @@ export declare const ListNecessidadesResponseItem: zod.ZodObject<{
     createdAt: Date;
     updatedAt: Date;
     descricao?: string | null | undefined;
+    workflow_status?: string | undefined;
+    unidade_requisitante?: string | null | undefined;
     orcamento_planejado?: number | null | undefined;
     orcamento_realizado?: number | null | undefined;
     ano?: number | null | undefined;
@@ -80,6 +86,8 @@ export declare const ListNecessidadesResponse: zod.ZodArray<zod.ZodObject<{
     eixo: zod.ZodString;
     classificacao_moscow: zod.ZodString;
     status: zod.ZodString;
+    workflow_status: zod.ZodOptional<zod.ZodString>;
+    unidade_requisitante: zod.ZodOptional<zod.ZodNullable<zod.ZodString>>;
     orcamento_planejado: zod.ZodOptional<zod.ZodNullable<zod.ZodNumber>>;
     orcamento_realizado: zod.ZodOptional<zod.ZodNullable<zod.ZodNumber>>;
     ano: zod.ZodOptional<zod.ZodNullable<zod.ZodNumber>>;
@@ -95,6 +103,8 @@ export declare const ListNecessidadesResponse: zod.ZodArray<zod.ZodObject<{
     createdAt: Date;
     updatedAt: Date;
     descricao?: string | null | undefined;
+    workflow_status?: string | undefined;
+    unidade_requisitante?: string | null | undefined;
     orcamento_planejado?: number | null | undefined;
     orcamento_realizado?: number | null | undefined;
     ano?: number | null | undefined;
@@ -108,6 +118,8 @@ export declare const ListNecessidadesResponse: zod.ZodArray<zod.ZodObject<{
     createdAt: Date;
     updatedAt: Date;
     descricao?: string | null | undefined;
+    workflow_status?: string | undefined;
+    unidade_requisitante?: string | null | undefined;
     orcamento_planejado?: number | null | undefined;
     orcamento_realizado?: number | null | undefined;
     ano?: number | null | undefined;
@@ -122,8 +134,10 @@ export declare const CreateNecessidadeBody: zod.ZodObject<{
     eixo: zod.ZodString;
     classificacao_moscow: zod.ZodString;
     status: zod.ZodString;
-    orcamento_planejado: zod.ZodOptional<zod.ZodNumber>;
-    orcamento_realizado: zod.ZodOptional<zod.ZodNumber>;
+    workflow_status: zod.ZodOptional<zod.ZodString>;
+    unidade_requisitante: zod.ZodOptional<zod.ZodString>;
+    orcamento_planejado: zod.ZodOptional<zod.ZodNullable<zod.ZodNumber>>;
+    orcamento_realizado: zod.ZodOptional<zod.ZodNullable<zod.ZodNumber>>;
     ano: zod.ZodOptional<zod.ZodNumber>;
     observacoes: zod.ZodOptional<zod.ZodString>;
 }, "strip", zod.ZodTypeAny, {
@@ -132,8 +146,10 @@ export declare const CreateNecessidadeBody: zod.ZodObject<{
     classificacao_moscow: string;
     titulo: string;
     descricao?: string | undefined;
-    orcamento_planejado?: number | undefined;
-    orcamento_realizado?: number | undefined;
+    workflow_status?: string | undefined;
+    unidade_requisitante?: string | undefined;
+    orcamento_planejado?: number | null | undefined;
+    orcamento_realizado?: number | null | undefined;
     ano?: number | undefined;
     observacoes?: string | undefined;
 }, {
@@ -142,8 +158,10 @@ export declare const CreateNecessidadeBody: zod.ZodObject<{
     classificacao_moscow: string;
     titulo: string;
     descricao?: string | undefined;
-    orcamento_planejado?: number | undefined;
-    orcamento_realizado?: number | undefined;
+    workflow_status?: string | undefined;
+    unidade_requisitante?: string | undefined;
+    orcamento_planejado?: number | null | undefined;
+    orcamento_realizado?: number | null | undefined;
     ano?: number | undefined;
     observacoes?: string | undefined;
 }>;
@@ -189,6 +207,8 @@ export declare const GetNecessidadeResponse: zod.ZodObject<{
     eixo: zod.ZodString;
     classificacao_moscow: zod.ZodString;
     status: zod.ZodString;
+    workflow_status: zod.ZodOptional<zod.ZodString>;
+    unidade_requisitante: zod.ZodOptional<zod.ZodNullable<zod.ZodString>>;
     orcamento_planejado: zod.ZodOptional<zod.ZodNullable<zod.ZodNumber>>;
     orcamento_realizado: zod.ZodOptional<zod.ZodNullable<zod.ZodNumber>>;
     ano: zod.ZodOptional<zod.ZodNullable<zod.ZodNumber>>;
@@ -204,6 +224,8 @@ export declare const GetNecessidadeResponse: zod.ZodObject<{
     createdAt: Date;
     updatedAt: Date;
     descricao?: string | null | undefined;
+    workflow_status?: string | undefined;
+    unidade_requisitante?: string | null | undefined;
     orcamento_planejado?: number | null | undefined;
     orcamento_realizado?: number | null | undefined;
     ano?: number | null | undefined;
@@ -217,6 +239,8 @@ export declare const GetNecessidadeResponse: zod.ZodObject<{
     createdAt: Date;
     updatedAt: Date;
     descricao?: string | null | undefined;
+    workflow_status?: string | undefined;
+    unidade_requisitante?: string | null | undefined;
     orcamento_planejado?: number | null | undefined;
     orcamento_realizado?: number | null | undefined;
     ano?: number | null | undefined;
@@ -238,8 +262,10 @@ export declare const UpdateNecessidadeBody: zod.ZodObject<{
     eixo: zod.ZodOptional<zod.ZodString>;
     classificacao_moscow: zod.ZodOptional<zod.ZodString>;
     status: zod.ZodOptional<zod.ZodString>;
-    orcamento_planejado: zod.ZodOptional<zod.ZodNumber>;
-    orcamento_realizado: zod.ZodOptional<zod.ZodNumber>;
+    workflow_status: zod.ZodOptional<zod.ZodString>;
+    unidade_requisitante: zod.ZodOptional<zod.ZodString>;
+    orcamento_planejado: zod.ZodOptional<zod.ZodNullable<zod.ZodNumber>>;
+    orcamento_realizado: zod.ZodOptional<zod.ZodNullable<zod.ZodNumber>>;
     ano: zod.ZodOptional<zod.ZodNumber>;
     observacoes: zod.ZodOptional<zod.ZodString>;
 }, "strip", zod.ZodTypeAny, {
@@ -248,8 +274,10 @@ export declare const UpdateNecessidadeBody: zod.ZodObject<{
     classificacao_moscow?: string | undefined;
     titulo?: string | undefined;
     descricao?: string | undefined;
-    orcamento_planejado?: number | undefined;
-    orcamento_realizado?: number | undefined;
+    workflow_status?: string | undefined;
+    unidade_requisitante?: string | undefined;
+    orcamento_planejado?: number | null | undefined;
+    orcamento_realizado?: number | null | undefined;
     ano?: number | undefined;
     observacoes?: string | undefined;
 }, {
@@ -258,8 +286,10 @@ export declare const UpdateNecessidadeBody: zod.ZodObject<{
     classificacao_moscow?: string | undefined;
     titulo?: string | undefined;
     descricao?: string | undefined;
-    orcamento_planejado?: number | undefined;
-    orcamento_realizado?: number | undefined;
+    workflow_status?: string | undefined;
+    unidade_requisitante?: string | undefined;
+    orcamento_planejado?: number | null | undefined;
+    orcamento_realizado?: number | null | undefined;
     ano?: number | undefined;
     observacoes?: string | undefined;
 }>;
@@ -270,6 +300,8 @@ export declare const UpdateNecessidadeResponse: zod.ZodObject<{
     eixo: zod.ZodString;
     classificacao_moscow: zod.ZodString;
     status: zod.ZodString;
+    workflow_status: zod.ZodOptional<zod.ZodString>;
+    unidade_requisitante: zod.ZodOptional<zod.ZodNullable<zod.ZodString>>;
     orcamento_planejado: zod.ZodOptional<zod.ZodNullable<zod.ZodNumber>>;
     orcamento_realizado: zod.ZodOptional<zod.ZodNullable<zod.ZodNumber>>;
     ano: zod.ZodOptional<zod.ZodNullable<zod.ZodNumber>>;
@@ -285,6 +317,8 @@ export declare const UpdateNecessidadeResponse: zod.ZodObject<{
     createdAt: Date;
     updatedAt: Date;
     descricao?: string | null | undefined;
+    workflow_status?: string | undefined;
+    unidade_requisitante?: string | null | undefined;
     orcamento_planejado?: number | null | undefined;
     orcamento_realizado?: number | null | undefined;
     ano?: number | null | undefined;
@@ -298,6 +332,8 @@ export declare const UpdateNecessidadeResponse: zod.ZodObject<{
     createdAt: Date;
     updatedAt: Date;
     descricao?: string | null | undefined;
+    workflow_status?: string | undefined;
+    unidade_requisitante?: string | null | undefined;
     orcamento_planejado?: number | null | undefined;
     orcamento_realizado?: number | null | undefined;
     ano?: number | null | undefined;

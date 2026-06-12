@@ -12,6 +12,8 @@ export interface NecessidadeInput {
     eixo: string;
     classificacao_moscow: string;
     status: string;
+    workflow_status?: string;
+    unidade_requisitante?: string;
     orcamento_planejado?: number;
     orcamento_realizado?: number;
     ano?: number;
