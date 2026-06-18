@@ -10,7 +10,7 @@ import {
   getGetDashboardSummaryQueryKey,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Plus, Search, Filter, Trash2, ExternalLink, ChevronDown } from "lucide-react";
+import { Plus, Search, Filter, Trash2, ExternalLink, ChevronDown, ChevronRight } from "lucide-react";
 import { MOSCOW_LABELS, MOSCOW_COLORS, STATUS_LABELS, STATUS_COLORS, WORKFLOW_LABELS, WORKFLOW_COLORS, EIXO_LABELS, formatCurrency } from "@/lib/moscow";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
@@ -22,6 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 const EIXOS = ["infraestrutura", "sistemas", "dados_inovacao_seguranca", "governanca"];
 const MOSCOW_OPTIONS = ["must", "should", "could", "wont"];
@@ -52,6 +53,15 @@ export default function Necessidades() {
   const [editingCell, setEditingCell] = useState<{ id: number; field: "moscow" | "status" | "workflow" } | null>(null);
   const [editingNum, setEditingNum] = useState<{ id: number; field: "orc_planejado" | "orc_realizado"; value: string } | null>(null);
   const [editingText, setEditingText] = useState<{ id: number; field: "unidade_requisitante"; value: string } | null>(null);
+  const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
+
+  const toggleExpanded = (id: number) => {
+    setExpandedRows((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
 
   // Read ?workflow=xxx from URL on mount
   useEffect(() => {
@@ -222,9 +232,37 @@ export default function Necessidades() {
             <tbody className="divide-y divide-border">
               {filtered.map((n) => (
                 <tr key={n.id} className="hover:bg-muted/20 transition-colors" data-testid={`row-necessidade-${n.id}`}>
-                  <td className="px-4 py-3">
-                    <p className="font-medium text-foreground line-clamp-1">{n.titulo}</p>
-                    {n.descricao && <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{n.descricao}</p>}
+                  <td className="px-4 py-3 align-top">
+                    {(() => {
+                      const isExpanded = expandedRows.has(n.id);
+                      return (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button
+                              type="button"
+                              onClick={() => toggleExpanded(n.id)}
+                              className="flex items-start gap-1.5 text-left w-full group"
+                              data-testid={`button-expand-necessidade-${n.id}`}
+                              title={isExpanded ? "Recolher" : "Expandir"}
+                            >
+                              <span className="mt-0.5 text-muted-foreground group-hover:text-foreground shrink-0">
+                                {isExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                              </span>
+                              <span className="min-w-0">
+                                <span className={`block font-medium text-foreground ${isExpanded ? "" : "line-clamp-1"}`}>{n.titulo}</span>
+                                {n.descricao && (
+                                  <span className={`block text-xs text-muted-foreground mt-0.5 ${isExpanded ? "whitespace-pre-wrap" : "line-clamp-1"}`}>{n.descricao}</span>
+                                )}
+                              </span>
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" align="start" className="max-w-md">
+                            <p className="font-medium text-sm">{n.titulo}</p>
+                            {n.descricao && <p className="text-xs text-muted-foreground mt-1 max-w-md whitespace-pre-wrap">{n.descricao}</p>}
+                          </TooltipContent>
+                        </Tooltip>
+                      );
+                    })()}
                   </td>
                   <td className="px-4 py-3 hidden lg:table-cell">
                     {editingText?.id === n.id && editingText.field === "unidade_requisitante" ? (
