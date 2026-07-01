@@ -2,9 +2,9 @@ services:
   - type: web
     name: pdtic-aeb
     runtime: node
-    plan: free
+    plan: starter
     rootDir: .
-    buildCommand: pnpm install --no-frozen-lockfile && pnpm --filter @workspace/db run build && pnpm --filter @workspace/pdtic-moscow run build && pnpm --filter @workspace/api-server run build
+    buildCommand: corepack pnpm install --no-frozen-lockfile && pnpm --filter @workspace/db run build && pnpm --filter @workspace/pdtic-moscow run build && pnpm --filter @workspace/api-server run build
     startCommand: node artifacts/api-server/dist/index.mjs
     envVars:
       - key: NODE_ENV
@@ -12,7 +12,17 @@ services:
       - key: PORT
         value: 10000
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: pdtic-aeb-db
+          property: connectionString
       - key: JWT_SECRET
-        sync: false
+        generateValue: true
+      - key: CORS_ORIGIN
+        value: https://pdtic-aeb.onrender.com
     healthCheckPath: /api/health
+
+databases:
+  - name: pdtic-aeb-db
+    plan: starter
+    databaseName: pdtic2026aeb
+    user: pdtic2026aeb
