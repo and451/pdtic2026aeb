@@ -6,6 +6,7 @@ import okrsRouter from "./okrs";
 import kpisRouter from "./kpis";
 import dashboardRouter from "./dashboard";
 import ciclosRouter from "./ciclos";
+import seedRouter from "./seed";
 
 const router: IRouter = Router();
 
@@ -16,5 +17,6 @@ router.use(okrsRouter);
 router.use(kpisRouter);
 router.use(dashboardRouter);
 router.use(ciclosRouter);
+router.use(seedRouter);
 
 export default router;
