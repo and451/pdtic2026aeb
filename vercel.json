@@ -1,4 +1,4 @@
 {
   "installCommand": "pnpm install --frozen-lockfile",
-  "buildCommand": "sh ./vercel-build.sh"
+  "buildCommand": "sh -c 'export NODE_ENV=production && pnpm -w run typecheck:libs && pnpm --filter @workspace/pdtic-moscow run build && mkdir -p .vercel/output/static && cp -r artifacts/pdtic-moscow/dist/. .vercel/output/static/ && printf \"{\\\"version\\\":3,\\\"routes\\\":[{\\\"handle\\\":\\\"filesystem\\\"},{\\\"src\\\":\\\"/(.*)\\\",\\\"dest\\\":\\\"/index.html\\\"}]}\\n\" > .vercel/output/config.json'"
 }
