@@ -10,17 +10,9 @@ services:
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
-        fromDatabase:
-          name: pdtic-aeb-db
-          property: connectionString
+        sync: false
       - key: JWT_SECRET
         generateValue: true
       - key: CORS_ORIGIN
         value: https://pdtic-aeb.onrender.com
     healthCheckPath: /api/health
-
-databases:
-  - name: pdtic-aeb-db
-    plan: starter
-    databaseName: pdtic2026aeb
-    user: pdtic2026aeb
