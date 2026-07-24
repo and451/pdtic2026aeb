@@ -1,6 +1,8 @@
 #!/bin/sh
 set -e
 
+export NODE_ENV=production
+
 pnpm -w run typecheck:libs
 pnpm --filter @workspace/pdtic-moscow run build
 
